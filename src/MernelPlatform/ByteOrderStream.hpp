@@ -26,6 +26,17 @@ concept HasWrite = requires(T t, ByteOrderDataStreamWriter& writer)
     t.writeBinary(writer);
 };
 
+template<class T>
+concept HasGlobalRead = requires(T t, ByteOrderDataStreamReader& reader)
+{
+    readBinary(reader, t);
+};
+template<class T>
+concept HasGlobalWrite = requires(T t, ByteOrderDataStreamWriter& writer)
+{
+    writeBinary(writer, t);
+};
+
 inline constexpr uint_fast8_t createByteorderMask(uint_fast8_t endiannes8, uint_fast8_t endiannes16, uint_fast8_t endiannes32)
 {
     return endiannes8 | (endiannes16 << 1) | (endiannes32 << 2);
@@ -138,6 +149,11 @@ public:
     inline ByteOrderDataStreamReader& operator>>(HasRead auto& data)
     {
         data.readBinary(*this);
+        return *this;
+    }
+    inline ByteOrderDataStreamReader& operator>>(HasGlobalRead auto& data)
+    {
+        readBinary(*this, data);
         return *this;
     }
 
@@ -331,6 +347,11 @@ public:
     inline ByteOrderDataStreamWriter& operator<<(const HasWrite auto& data)
     {
         data.writeBinary(*this);
+        return *this;
+    }
+    inline ByteOrderDataStreamWriter& operator<<(const HasGlobalWrite auto& data)
+    {
+        writeBinary(*this, data);
         return *this;
     }
 
