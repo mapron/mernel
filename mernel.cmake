@@ -8,3 +8,7 @@ AddTarget(TYPE static NAME MernelReflection
     EXPORT_PARENT_INCLUDES
     EXPORT_LINK
     LINK_LIBRARIES MernelPlatform frozen)
+
+AddTarget(TYPE shared NAME MernelExecution
+    SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src/MernelExecution
+    EXPORT_PARENT_INCLUDES)
