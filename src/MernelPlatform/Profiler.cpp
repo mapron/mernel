@@ -43,7 +43,7 @@ struct ProfilerContext::Impl {
         stackPrefix += std::string{ key } + "->";
         stack.push_back(stackPrefix);
 #ifdef FH_ENABLE_PROFILER_LOGGING
-        Logger(Logger::Info) << stackPrefix;
+        Logger(Logger::Debug) << stackPrefix;
 #endif
     }
     void addRecord(std::string_view key, int64_t value)
@@ -51,7 +51,7 @@ struct ProfilerContext::Impl {
         std::string keyFull = stackPrefix + std::string(key);
         all[std::move(keyFull)].add(value);
 #ifdef FH_ENABLE_PROFILER_LOGGING
-        Logger(Logger::Info) << "/ " << stackPrefix;
+        Logger(Logger::Debug) << "/ " << stackPrefix;
 #endif
     }
 

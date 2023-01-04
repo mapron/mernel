@@ -34,7 +34,6 @@ public:
         , m_appendEndl(appendEndl)
     {
         m_startTime = ChronoPoint(true);
-        m_prevTime  = m_startTime;
     }
 
     bool LogEnabled(int logLevel) const override { return logLevel <= m_maxLogLevel; }
@@ -51,10 +50,10 @@ public:
 
         if (m_outputTimeoffsets) {
             ChronoPoint now(true);
-            const auto  fromStart = (now - m_startTime).GetUS();
-            const auto  fromPrev  = (now - m_prevTime).GetUS();
-            os << "[" << fromStart << ", +" << fromPrev << "] ";
-            m_prevTime = now;
+            const auto  fromStart = (now - m_startTime);
+            const auto  sec       = fromStart.GetSeconds();
+            const auto  us        = fromStart.GetFractionalUS();
+            os << "[" << sec << "." << std::setw(6) << std::setfill('0') << us << "] ";
         }
         os << message;
         if (m_appendEndl)
@@ -90,13 +89,12 @@ protected:
     }
 
 private:
-    ChronoPoint         m_startTime;
-    mutable ChronoPoint m_prevTime;
-    const int           m_maxLogLevel;
-    const bool          m_outputLoglevel;
-    const bool          m_outputTimestamp;
-    const bool          m_outputTimeoffsets;
-    const bool          m_appendEndl;
+    ChronoPoint m_startTime;
+    const int   m_maxLogLevel;
+    const bool  m_outputLoglevel;
+    const bool  m_outputTimestamp;
+    const bool  m_outputTimeoffsets;
+    const bool  m_appendEndl;
 };
 
 class LoggerBackendConsole : public AbstractLoggerBackend {
