@@ -14,6 +14,26 @@
 
 namespace Mernel::Reflection {
 
+template<class T>
+concept HasToJsonWrite = requires(T t, PropertyTree& data)
+{
+    t.convertToJson(data);
+};
+
+template<class T>
+concept HasToJsonWriteGlobal = !PropertyTreeScalarHeld<T> && requires(T t, PropertyTree& data)
+{
+    convertToJson(t, data);
+};
+
+template<class T>
+concept HasToStringWrite = requires(T t, std::string& data)
+{
+    data = t.toString();
+};
+template<typename T>
+concept HasFieldsForWrite = HasFields<T> && !HasCustomTransformWrite<T> && !HasToStringWrite<T> && !HasToJsonWrite<T>;
+
 template<class CustomWriter>
 class PropertyTreeWriterBase {
 public:
@@ -33,8 +53,7 @@ public:
         std::apply([&visitor](auto&&... field) { ((visitor(field)), ...); }, MetaInfo::s_fields<T>);
     }
 
-    template<HasFieldsForWrite T>
-    void valueToJson(const T& value, PropertyTree& result)
+    void valueToJson(const HasFieldsForWrite auto& value, PropertyTree& result)
     {
         valueToJsonUsingMeta(value, result);
     }
@@ -59,14 +78,20 @@ public:
             result = std::move(tmp);
     }
 
-    template<HasToStringWrite T>
-    void valueToJson(const T& value, PropertyTree& result)
+    void valueToJson(const HasToStringWrite auto& value, PropertyTree& result)
     {
         result = PropertyTreeScalar(value.toString());
     }
+    void valueToJson(const HasToJsonWrite auto& value, PropertyTree& result)
+    {
+        value.convertToJson(result);
+    }
+    void valueToJson(const HasToJsonWriteGlobal auto& value, PropertyTree& result)
+    {
+        convertToJson(value, result);
+    }
 
-    template<NonAssociative Container>
-    void valueToJson(const Container& container, PropertyTree& result)
+    void valueToJson(const NonAssociative auto& container, PropertyTree& result)
     {
         result = {};
         result.convertToList();
@@ -78,8 +103,7 @@ public:
         }
     }
 
-    template<IsStdOptional Container>
-    void valueToJson(const Container& container, PropertyTree& result)
+    void valueToJson(const IsStdOptional auto& container, PropertyTree& result)
     {
         result = {};
         result.convertToList();
@@ -92,8 +116,7 @@ public:
         valueToJson(container.value(), child);
     }
 
-    template<IsMap Container>
-    void valueToJson(const Container& container, PropertyTree& result)
+    void valueToJson(const IsMap auto& container, PropertyTree& result)
     {
         result = {};
         result.convertToList();
@@ -105,8 +128,7 @@ public:
         }
     }
 
-    template<IsStringMap Container>
-    void valueToJson(const Container& container, PropertyTree& result)
+    void valueToJson(const IsStringMap auto& container, PropertyTree& result)
     {
         result = {};
         result.convertToMap();
@@ -117,6 +139,9 @@ public:
 
             valueToJson(value, result[childKey.getScalar().toString()]);
         }
+    }
+    void valueToJson(const IsEmptyType auto& container, PropertyTree& result)
+    {
     }
 
     template<class T>

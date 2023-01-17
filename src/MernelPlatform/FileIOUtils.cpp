@@ -9,7 +9,7 @@
 
 namespace Mernel {
 
-bool readFileIntoBuffer(const std_path& filename, std::string& buffer) noexcept(true)
+bool readFileIntoBufferNoexcept(const std_path& filename, std::string& buffer) noexcept(true)
 {
     std::ifstream ifs((filename), std::ios_base::in | std::ios_base::binary);
     if (!ifs)
@@ -23,7 +23,7 @@ bool readFileIntoBuffer(const std_path& filename, std::string& buffer) noexcept(
     return true;
 }
 
-bool writeFileFromBuffer(const std_path& filename, const std::string& buffer) noexcept(true)
+bool writeFileFromBufferNoexcept(const std_path& filename, const std::string& buffer) noexcept(true)
 {
     std::ofstream ofs((filename), std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
     if (!ofs)
@@ -38,49 +38,49 @@ bool writeFileFromBuffer(const std_path& filename, const std::string& buffer) no
     return true;
 }
 
-bool readFileIntoHolder(const std_path& filename, ByteArrayHolder& holder) noexcept(true)
+bool readFileIntoHolderNoexcept(const std_path& filename, ByteArrayHolder& holder) noexcept(true)
 {
     std::string buffer;
-    if (!readFileIntoBuffer(filename, buffer))
+    if (!readFileIntoBufferNoexcept(filename, buffer))
         return false;
     holder.resize(buffer.size());
     memcpy(holder.data(), buffer.data(), holder.size());
     return true;
 }
 
-bool writeFileFromHolder(const std_path& filename, const ByteArrayHolder& holder) noexcept(true)
+bool writeFileFromHolderNoexcept(const std_path& filename, const ByteArrayHolder& holder) noexcept(true)
 {
     std::string buffer;
     buffer.resize(holder.size());
     memcpy(buffer.data(), holder.data(), holder.size());
-    return writeFileFromBuffer(filename, buffer);
+    return writeFileFromBufferNoexcept(filename, buffer);
 }
 
-std::string readFileIntoBufferThrow(const std_path& filename) noexcept(false)
+std::string readFileIntoBuffer(const std_path& filename) noexcept(false)
 {
     std::string buffer;
-    if (!readFileIntoBuffer(filename, buffer))
+    if (!readFileIntoBufferNoexcept(filename, buffer))
         throw std::runtime_error("Failed to read file: " + path2string(filename));
     return buffer;
 }
 
-void writeFileFromBufferThrow(const std_path& filename, const std::string& buffer) noexcept(false)
+void writeFileFromBuffer(const std_path& filename, const std::string& buffer) noexcept(false)
 {
-    if (!writeFileFromBuffer(filename, buffer))
+    if (!writeFileFromBufferNoexcept(filename, buffer))
         throw std::runtime_error("Failed to write file: " + path2string(filename));
 }
 
-ByteArrayHolder readFileIntoHolderThrow(const std_path& filename) noexcept(false)
+ByteArrayHolder readFileIntoHolder(const std_path& filename) noexcept(false)
 {
     ByteArrayHolder holder;
-    if (!readFileIntoHolder(filename, holder))
+    if (!readFileIntoHolderNoexcept(filename, holder))
         throw std::runtime_error("Failed to read file: " + path2string(filename));
     return holder;
 }
 
-void writeFileFromHolderThrow(const std_path& filename, const ByteArrayHolder& holder) noexcept(false)
+void writeFileFromHolder(const std_path& filename, const ByteArrayHolder& holder) noexcept(false)
 {
-    if (!writeFileFromHolder(filename, holder))
+    if (!writeFileFromHolderNoexcept(filename, holder))
         throw std::runtime_error("Failed to write file: " + path2string(filename));
 }
 

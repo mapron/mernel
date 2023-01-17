@@ -14,6 +14,24 @@
 
 namespace Mernel::Reflection {
 
+template<class T>
+concept HasFromJsonRead = requires(T t, const PropertyTree& data)
+{
+    t.convertFromJson(data);
+};
+template<class T>
+concept HasFromJsonReadGlobal = !PropertyTreeScalarHeld<T> && requires(T t, const PropertyTree& data)
+{
+    convertFromJson(data, t);
+};
+template<class T>
+concept HasFromStringRead = requires(T t, const std::string& data)
+{
+    t.fromString(data);
+};
+template<typename T>
+concept HasFieldsForRead = HasFields<T> && !HasCustomTransformRead<T> && !HasFromStringRead<T> && !HasFromJsonRead<T>;
+
 template<class CustomReader>
 class PropertyTreeReaderBase {
 public:
@@ -61,14 +79,23 @@ public:
             jsonToValueUsingMeta(json, value);
     }
 
-    template<HasFromStringRead T>
-    void jsonToValue(const PropertyTree& json, T& value)
+    void jsonToValue(const PropertyTree& json, HasFromStringRead auto& value)
     {
         if (!json.isScalar() || !json.getScalar().isString())
             return jsonToValueUsingMeta(json, value);
 
         std::string tmp = json.getScalar().toString();
         value.fromString(std::move(tmp));
+    }
+
+    void jsonToValue(const PropertyTree& json, HasFromJsonRead auto& value)
+    {
+        value.convertFromJson(value);
+    }
+
+    void jsonToValue(const PropertyTree& json, HasFromJsonReadGlobal auto& value)
+    {
+        convertFromJson(json, value);
     }
 
     template<NonAssociative Container>
@@ -145,6 +172,10 @@ public:
             jsonToValue(keyScalar, key);
             container[key] = value;
         }
+    }
+
+    void jsonToValue(const PropertyTree& json, IsEmptyType auto& container)
+    {
     }
 
     template<class T>

@@ -13,15 +13,15 @@
 
 namespace Mernel {
 
-MERNELPLATFORM_EXPORT bool readFileIntoBuffer(const std_path& filename, std::string& buffer) noexcept(true);
-MERNELPLATFORM_EXPORT bool writeFileFromBuffer(const std_path& filename, const std::string& buffer) noexcept(true);
+MERNELPLATFORM_EXPORT bool readFileIntoBufferNoexcept(const std_path& filename, std::string& buffer) noexcept(true);
+MERNELPLATFORM_EXPORT bool writeFileFromBufferNoexcept(const std_path& filename, const std::string& buffer) noexcept(true);
 
-MERNELPLATFORM_EXPORT bool readFileIntoHolder(const std_path& filename, ByteArrayHolder& holder) noexcept(true);
-MERNELPLATFORM_EXPORT bool writeFileFromHolder(const std_path& filename, const ByteArrayHolder& holder) noexcept(true);
+MERNELPLATFORM_EXPORT bool readFileIntoHolderNoexcept(const std_path& filename, ByteArrayHolder& holder) noexcept(true);
+MERNELPLATFORM_EXPORT bool writeFileFromHolderNoexcept(const std_path& filename, const ByteArrayHolder& holder) noexcept(true);
 
-MERNELPLATFORM_EXPORT std::string readFileIntoBufferThrow(const std_path& filename) noexcept(false);
-MERNELPLATFORM_EXPORT void        writeFileFromBufferThrow(const std_path& filename, const std::string& buffer) noexcept(false);
+MERNELPLATFORM_EXPORT std::string readFileIntoBuffer(const std_path& filename) noexcept(false);
+MERNELPLATFORM_EXPORT void        writeFileFromBuffer(const std_path& filename, const std::string& buffer) noexcept(false);
 
-MERNELPLATFORM_EXPORT ByteArrayHolder readFileIntoHolderThrow(const std_path& filename) noexcept(false);
-MERNELPLATFORM_EXPORT void            writeFileFromHolderThrow(const std_path& filename, const ByteArrayHolder& holder) noexcept(false);
+MERNELPLATFORM_EXPORT ByteArrayHolder readFileIntoHolder(const std_path& filename) noexcept(false);
+MERNELPLATFORM_EXPORT void            writeFileFromHolder(const std_path& filename, const ByteArrayHolder& holder) noexcept(false);
 }

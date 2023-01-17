@@ -84,6 +84,8 @@ double PropertyTreeScalar::toDouble() const noexcept
         return *dval;
     if (const auto* ival = std::get_if<int64_t>(&m_data); ival)
         return static_cast<double>(*ival);
+    if (const auto* bval = std::get_if<bool>(&m_data); bval)
+        return *bval;
     return 0.;
 }
 
@@ -122,17 +124,17 @@ void PropertyTreeScalar::print(std::ostream& os, bool addQuotes, bool escapeStri
     os << "null";
 }
 
-void PropertyTree::append(PropertyTree child)
+void PropertyTree::append(PropertyTree child) noexcept(false)
 {
     convertToList();
-    PropertyTreeList& l = std::get<PropertyTreeList>(m_data);
+    PropertyTreeList& l = getList();
     l.push_back(std::move(child));
 }
 
-void PropertyTree::insert(const std::string& key, PropertyTree child)
+void PropertyTree::insert(const std::string& key, PropertyTree child) noexcept(false)
 {
     convertToMap();
-    PropertyTreeMap& m = std::get<PropertyTreeMap>(m_data);
+    PropertyTreeMap& m = getMap();
     m[key]             = std::move(child);
 }
 
@@ -140,14 +142,16 @@ void PropertyTree::convertToList() noexcept(false)
 {
     if (m_data.index() == 0)
         m_data = PropertyTreeList{};
-    assert(isList());
+    if (!isList())
+        throw std::runtime_error("Trying to convert varaint to list on non-empty variant");
 }
 
 void PropertyTree::convertToMap() noexcept(false)
 {
     if (m_data.index() == 0)
         m_data = PropertyTreeMap{};
-    assert(isMap());
+    if (!isMap())
+        throw std::runtime_error("Trying to convert varaint to map on non-empty variant");
 }
 
 void PropertyTree::dump(std::ostream& stream, const DumpParams& params, int level) const noexcept

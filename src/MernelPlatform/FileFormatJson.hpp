@@ -13,10 +13,10 @@ namespace Mernel {
 
 /// @todo: rewrite noexcept version as wrappers over throwing.
 
-MERNELPLATFORM_EXPORT bool readJsonFromBuffer(const std::string& buffer, PropertyTree& data) noexcept(true);
-MERNELPLATFORM_EXPORT bool writeJsonToBuffer(std::string& buffer, const PropertyTree& data, bool pretty = false) noexcept(true);
+MERNELPLATFORM_EXPORT bool readJsonFromBufferNoexcept(const std::string& buffer, PropertyTree& data) noexcept(true);
+MERNELPLATFORM_EXPORT bool writeJsonToBufferNoexcept(std::string& buffer, const PropertyTree& data, bool pretty = false) noexcept(true);
 
-MERNELPLATFORM_EXPORT PropertyTree readJsonFromBufferThrow(const std::string& buffer) noexcept(false);
-MERNELPLATFORM_EXPORT std::string writeJsonToBufferThrow(const PropertyTree& data, bool pretty = false) noexcept(false);
+MERNELPLATFORM_EXPORT PropertyTree readJsonFromBuffer(const std::string& buffer) noexcept(false);
+MERNELPLATFORM_EXPORT std::string writeJsonToBuffer(const PropertyTree& data, bool pretty = false) noexcept(false);
 
 }
