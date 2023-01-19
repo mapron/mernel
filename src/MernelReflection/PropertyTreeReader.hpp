@@ -44,11 +44,16 @@ public:
             if (jsonMap.contains(field.name())) {
                 auto writer = field.makeValueWriter(value);
                 this->jsonToValue(jsonMap.at(field.name()), writer.getRef());
-            } else {
-                field.reset(value);
+            } else if (m_resetToDefault) {
+                if constexpr (std::is_default_constructible_v<T>) {
+                    const T& defParent = MetaInfo::getDefaultConstructed<T>();
+                    auto     defValue  = field.get(defParent);
+                    auto     writer    = field.makeValueWriter(value);
+                    writer.getRef()    = std::move(defValue);
+                }
             }
         };
-        std::apply([&visitor](auto&&... field) { ((visitor(field)), ...); }, MetaInfo::s_fields<T>);
+        std::apply([&visitor](auto&&... field) { ((visitor(field)), ...); }, MetaInfo::MetaFields<T>::s_fields);
     }
 
     template<HasFieldsForRead T>
@@ -183,6 +188,8 @@ public:
     {
         static_cast<CustomReader*>(this)->jsonToValueImpl(json, value);
     }
+
+    bool m_resetToDefault = true;
 };
 
 class PropertyTreeReader : public PropertyTreeReaderBase<PropertyTreeReader> {};

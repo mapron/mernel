@@ -25,13 +25,19 @@
 #define MAKE_FIELD_LIST_STRINGIFY_OFFSET_2(typeBase, ...) \
     INTERNAL_EXPAND(FOR_EACH_BY_SINGLE(MAKE_FIELD_SINGLE_OFFSET_2, typeBase, __VA_ARGS__))
 
-#define STRUCT_REFLECTION_PREFIX(typeBase) \
-    template<> \
-    inline constexpr const std::tuple MetaInfo::s_fields<typeBase> \
-    {
+// clang-format off
+#define STRUCT_REFLECTION_PREFIX(typeBase)                                 \
+    template <>                                                            \
+    struct MetaInfo::MetaFields<typeBase>                                  \
+    {                                                                      \
+        [[maybe_unused]] static inline constexpr const std::tuple s_fields \
+        {
+
 #define STRUCT_REFLECTION_SUFFIX() \
-    } \
+    };                             \
+    }                              \
     ;
+// clang-format on
 
 #define STRUCT_REFLECTION_PAIRED(typeBase, ...) \
     STRUCT_REFLECTION_PREFIX(typeBase) \
@@ -52,3 +58,9 @@
     STRUCT_REFLECTION_PREFIX(typeBase) \
     INTERNAL_EXPAND(MAKE_FIELD_LIST_STRINGIFY_OFFSET_2(typeBase, __VA_ARGS__)) \
     STRUCT_REFLECTION_SUFFIX()
+
+#define FIELD_SET_GET_LAMBDA(typeBase, fieldType, propertyName, setterName, getterName) \
+    SetGetLambda<typeBase, fieldType>( \
+        propertyName, \
+        [](typeBase& obj, fieldType val) { obj.setterName(val); }, \
+        [](const typeBase& obj) { return obj.getterName(); })

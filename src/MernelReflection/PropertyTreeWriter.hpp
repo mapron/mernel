@@ -40,17 +40,28 @@ public:
     template<class T>
     void valueToJsonUsingMeta(const T& value, PropertyTree& result)
     {
-        result = {};
+        if (m_clearMaps)
+            result = {};
         result.convertToMap();
         auto& jsonMap = result.getMap();
 
         auto visitor = [&value, &jsonMap, this](auto&& field) {
             const auto& fieldVal = field.get(value);
-            if (!field.isDefault(fieldVal))
-                this->valueToJson(fieldVal, jsonMap[field.name()]);
+            using FieldType      = std::remove_cvref_t<decltype(fieldVal)>;
+
+            if (m_skipDefault) {
+                if constexpr (std::is_default_constructible_v<T> && details::is_comparable<FieldType>()) {
+                    const T&         defParent = MetaInfo::getDefaultConstructed<T>();
+                    const FieldType& defValue  = field.get(defParent);
+                    if (fieldVal == defValue)
+                        return;
+                }
+            }
+
+            this->valueToJson(fieldVal, jsonMap[field.name()]);
         };
 
-        std::apply([&visitor](auto&&... field) { ((visitor(field)), ...); }, MetaInfo::s_fields<T>);
+        std::apply([&visitor](auto&&... field) { ((visitor(field)), ...); }, MetaInfo::MetaFields<T>::s_fields);
     }
 
     void valueToJson(const HasFieldsForWrite auto& value, PropertyTree& result)
@@ -130,7 +141,8 @@ public:
 
     void valueToJson(const IsStringMap auto& container, PropertyTree& result)
     {
-        result = {};
+        if (m_clearMaps)
+            result = {};
         result.convertToMap();
         for (const auto& [key, value] : container) {
             PropertyTree childKey;
@@ -149,6 +161,9 @@ public:
     {
         static_cast<CustomWriter*>(this)->valueToJsonImpl(value, result);
     }
+
+    bool m_clearMaps   = true;
+    bool m_skipDefault = true;
 };
 class PropertyTreeWriter : public PropertyTreeWriterBase<PropertyTreeWriter> {};
 

@@ -24,14 +24,14 @@
 
 #define ENUM_REFLECTION_PAIRED(enumBase, def, ...) \
     template<> \
-    inline constexpr const auto EnumTraits::s_valueMapping<enumBase> = EnumTraits::Meta<enumBase, (GET_ARG_COUNT(__VA_ARGS__) / 2)>{ \
+    inline constexpr const auto s_valueMapping<enumBase> = EnumTraits::Meta<enumBase, (GET_ARG_COUNT(__VA_ARGS__) / 2)>{ \
         .m_default = enumBase::def, \
         INTERNAL_EXPAND(MAKE_TO_FROM_ENUM_LIST_PAIRED(enumBase, __VA_ARGS__)) \
     };
 
 #define ENUM_REFLECTION_STRINGIFY(enumBase, def, ...) \
     template<> \
-    inline constexpr const auto EnumTraits::s_valueMapping<enumBase> = EnumTraits::Meta<enumBase, GET_ARG_COUNT(__VA_ARGS__)>{ \
+    inline constexpr const auto s_valueMapping<enumBase> = EnumTraits::Meta<enumBase, GET_ARG_COUNT(__VA_ARGS__)>{ \
         .m_default = enumBase::def, \
         INTERNAL_EXPAND(MAKE_TO_FROM_ENUM_LIST_SINGLE(enumBase, __VA_ARGS__)) \
     };

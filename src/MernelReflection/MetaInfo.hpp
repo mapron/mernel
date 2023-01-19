@@ -125,24 +125,6 @@ struct MetaInfo {
         {
             return parent.*m_f;
         }
-        [[nodiscard]] bool isDefault(const FieldType& value) const noexcept
-        {
-            if constexpr (std::is_default_constructible_v<Parent> && details::is_comparable<FieldType>()) {
-                const Parent&    defParent = getDefaultConstructed<Parent>();
-                const FieldType& defValue  = defParent.*m_f;
-                return value == defValue;
-            } else {
-                return false;
-            }
-        }
-        void reset(Parent& value) const noexcept
-        {
-            if constexpr (std::is_default_constructible_v<Parent>) {
-                const Parent&    defParent = getDefaultConstructed<Parent>();
-                const FieldType& defValue  = defParent.*m_f;
-                value.*m_f                 = defValue;
-            }
-        }
 
         [[nodiscard]] std::string name() const noexcept
         {
@@ -197,13 +179,6 @@ struct MetaInfo {
         {
             m_setter(parent, std::move(value));
         }
-        [[nodiscard]] bool isDefault(const FieldType& value) const noexcept
-        {
-            return false;
-        }
-        void reset(Parent&) const noexcept
-        {
-        }
 
         [[nodiscard]] std::string name() const noexcept
         {
@@ -213,6 +188,45 @@ struct MetaInfo {
         frozen::string m_name;
         ArgTypeSetter  m_setter;
         ArgTypeGetter  m_getter;
+    };
+
+    /**
+     * usage:
+     * SetGet("property", &MyType::setProp, &MyType::getProperty)
+     */
+    template<class Parent, typename ArgTypeSetter, typename ArgTypeGetter>
+    struct SetGet {
+        using FieldType = std::remove_reference_t<std::remove_cv_t<ArgTypeGetter>>;
+
+        constexpr SetGet(frozen::string name, void (Parent::*setter)(ArgTypeSetter), ArgTypeGetter (Parent::*getter)() const)
+            : m_name(name)
+            , m_setter(setter)
+            , m_getter(getter)
+        {}
+
+        struct ValueWriter {
+            const SetGet& m_field;
+            Parent&       m_parent;
+            FieldType     m_tmp{};
+
+            constexpr FieldType& getRef() { return m_tmp; }
+
+            constexpr ~ValueWriter() { m_field.set(m_parent, std::move(m_tmp)); }
+        };
+
+        constexpr ValueWriter makeValueWriter(Parent& parent) const noexcept { return { *this, parent }; }
+
+        constexpr ArgTypeGetter get(const Parent& parent) const noexcept { return (parent.*m_getter)(); }
+        constexpr void          set(Parent& parent, ArgTypeSetter value) const noexcept { (parent.*m_setter)(std::move(value)); }
+
+        [[nodiscard]] std::string name() const noexcept
+        {
+            return std::string(m_name.begin(), m_name.end()); // if this throws, we don't care, abort is fine.
+        }
+
+        frozen::string m_name;
+        void (Parent::*m_setter)(ArgTypeSetter);
+        ArgTypeGetter (Parent::*m_getter)() const;
     };
 
     /**
@@ -255,13 +269,6 @@ struct MetaInfo {
         {
             (parent.*m_setter)(std::move(value));
         }
-        [[nodiscard]] bool isDefault(const ArgTypeGetter& value) const noexcept
-        {
-            return false;
-        }
-        void reset(Parent&) const noexcept
-        {
-        }
 
         [[nodiscard]] std::string name() const noexcept
         {
@@ -274,19 +281,9 @@ struct MetaInfo {
     };
 
     template<class Parent>
-    static inline constexpr const bool s_useCustomTransformRead{ false };
-
-    template<class Parent>
-    static inline constexpr const bool s_useCustomTransformWrite{ false };
-
-    template<class Parent>
-    static inline constexpr const bool s_fields{ false };
-
-    template<class Parent>
-    static inline constexpr const bool s_isStringMap{ false };
-
-    template<class Parent>
-    static inline constexpr const bool s_isEmpty{ false };
+    struct MetaFields {
+        static inline constexpr const bool s_fields{ false };
+    };
 
     template<class Parent>
     static inline bool transformTreeRead(const PropertyTree& treeIn, PropertyTree& treeOut);
@@ -295,19 +292,31 @@ struct MetaInfo {
     static inline bool transformTreeWrite(const PropertyTree& treeIn, PropertyTree& treeOut);
 };
 
-template<typename T>
-concept HasCustomTransformRead = MetaInfo::s_useCustomTransformRead<T>;
+template<class Parent>
+[[maybe_unused]] static inline constexpr const bool s_useCustomTransformRead{ false };
+
+template<class Parent>
+[[maybe_unused]] static inline constexpr const bool s_useCustomTransformWrite{ false };
+
+template<class Parent>
+[[maybe_unused]] static inline constexpr const bool s_isStringMap{ false };
+
+template<class Parent>
+[[maybe_unused]] static inline constexpr const bool s_isEmpty{ false };
 
 template<typename T>
-concept HasCustomTransformWrite = MetaInfo::s_useCustomTransformWrite<T>;
+concept HasCustomTransformRead = s_useCustomTransformRead<T>;
 
 template<typename T>
-concept HasFields = !std::is_same_v<std::remove_cvref_t<decltype(MetaInfo::s_fields<T>)>, bool>;
+concept HasCustomTransformWrite = s_useCustomTransformWrite<T>;
 
 template<typename T>
-concept IsStringMap = IsMap<T> && MetaInfo::s_isStringMap<T>;
+concept HasFields = !std::is_same_v<std::remove_cvref_t<decltype(MetaInfo::MetaFields<T>::s_fields)>, bool>;
 
 template<typename T>
-concept IsEmptyType = MetaInfo::s_isEmpty<T>;
+concept IsStringMap = IsMap<T> && s_isStringMap<T>;
+
+template<typename T>
+concept IsEmptyType = s_isEmpty<T>;
 
 }

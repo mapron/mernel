@@ -34,14 +34,11 @@ public:
     PropertyTreeScalar(PropertyTreeScalar&&) noexcept = default;
     PropertyTreeScalar& operator=(PropertyTreeScalar&& rh) noexcept = default;
 
-    explicit PropertyTreeScalar(std::integral auto value)
-        : m_data(value)
-    {}
-    explicit PropertyTreeScalar(uint64_t value)
+    explicit PropertyTreeScalar(PropertyTreeIntegral auto value)
         : m_data(static_cast<int64_t>(value))
     {}
-    explicit PropertyTreeScalar(std::floating_point auto value)
-        : m_data(value)
+    explicit PropertyTreeScalar(PropertyTreeFloating auto value)
+        : m_data(static_cast<double>(value))
     {}
     explicit PropertyTreeScalar(std::string value)
         : m_data(std::move(value))
@@ -56,7 +53,7 @@ public:
     int64_t            toInt() const noexcept;
     double             toDouble() const noexcept;
 
-    template<std::integral T>
+    template<PropertyTreeIntegral T>
     void convertTo(T& value) const noexcept
     {
         value = static_cast<T>(toInt());
@@ -65,7 +62,7 @@ public:
     {
         value = toBool();
     }
-    template<std::floating_point T>
+    template<PropertyTreeFloating T>
     void convertTo(T& value) const noexcept
     {
         value = static_cast<T>(toDouble());

@@ -15,6 +15,9 @@ namespace Mernel::Reflection {
 template<class T>
 concept IsEnum = std::is_enum_v<T>;
 
+template<IsEnum Enum>
+static inline constexpr const bool s_valueMapping{ false };
+
 struct EnumTraits {
     template<IsEnum Enum, size_t size>
     struct Meta {
@@ -22,9 +25,6 @@ struct EnumTraits {
         frozen::unordered_map<frozen::string, Enum, size> m_toEnum;
         frozen::unordered_map<Enum, frozen::string, size> m_fromEnum;
     };
-
-    template<IsEnum Enum>
-    static inline constexpr const bool s_valueMapping{ false };
 
     template<IsEnum Enum>
     constexpr static frozen::string enumToString(Enum value)
