@@ -40,8 +40,14 @@ public:
     explicit PropertyTreeScalar(PropertyTreeFloating auto value)
         : m_data(static_cast<double>(value))
     {}
+    explicit PropertyTreeScalar(bool value)
+        : m_data(value)
+    {}
     explicit PropertyTreeScalar(std::string value)
         : m_data(std::move(value))
+    {}
+    explicit PropertyTreeScalar(const char* value)
+        : m_data(std::string(value))
     {}
 
     bool operator==(const PropertyTreeScalar& rh) const noexcept = default;
@@ -58,19 +64,13 @@ public:
     {
         value = static_cast<T>(toInt());
     }
-    void convertTo(bool& value) const noexcept
-    {
-        value = toBool();
-    }
+    void convertTo(bool& value) const noexcept { value = toBool(); }
     template<PropertyTreeFloating T>
     void convertTo(T& value) const noexcept
     {
         value = static_cast<T>(toDouble());
     }
-    void convertTo(std::string& value) const noexcept
-    {
-        value = toString();
-    }
+    void convertTo(std::string& value) const noexcept { value = toString(); }
 
     // print any possible value as a string.
     [[nodiscard]] std::string dump() const noexcept;
@@ -114,8 +114,7 @@ public:
     }
     explicit PropertyTree(PropertyTreeMap tmap)
         : m_data(std::move(tmap))
-    {
-    }
+    {}
 
     // check what is inside
     [[nodiscard]] bool isNull() const noexcept { return m_data.index() == 0; }
@@ -163,7 +162,7 @@ public:
         throw std::runtime_error("Invalid variant access, map expected");
     }
 
-    // checks if container have child object with provided key. returns false if property not a map.
+    // checks if container has child object with provided key. returns false if property is not a map.
     bool contains(const std::string& key) const noexcept
     {
         if (!isMap())
@@ -172,11 +171,8 @@ public:
     }
 
     // get direct access to child value by key. Will throw if no key exists or variant is not a map.
-    const PropertyTree& operator[](const std::string& key) const noexcept(false)
-    {
-        return getMap().at(key);
-    }
-    // add new key into map or modify existing one. property will automatically converted to map type.
+    const PropertyTree& operator[](const std::string& key) const noexcept(false) { return getMap().at(key); }
+    // add new key into map or modify existing one. property will be automatically converted to map type.
     PropertyTree& operator[](const std::string& key) noexcept(false)
     {
         if (m_data.index() == 0)
@@ -201,7 +197,7 @@ public:
     // may throw if current value is not null or list. You only need this if you want to make an empty list.
     void convertToList() noexcept(false);
 
-    // may throw if current value is not null or map. You only need this if you want to make an empty list.
+    // may throw if current value is not null or map. You only need this if you want to make an empty map.
     void convertToMap() noexcept(false);
 
     struct DumpParams {
@@ -221,7 +217,7 @@ public:
     static void mergePatch(PropertyTree& dest, const PropertyTree& source) noexcept(false);
     static void removeEqualValues(PropertyTree& one, PropertyTree& two) noexcept(false);
 
-    // that function is not utf-safe! Only for debugging purpose (or if you sure no Unicode string exist)
+    // that function is not utf-safe! Only for debugging purpose (or if you sure that no Unicode string exist)
     static void printReadableJson(std::ostream& stream, const PropertyTree& source) noexcept;
 
     MERNELPLATFORM_EXPORT friend std::ostream& operator<<(std::ostream& stream, const PropertyTree& tree);
