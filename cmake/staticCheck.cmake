@@ -33,7 +33,7 @@ function(AddStaticCheckTarget)
         return()
     endif()
 
-    set(pythonScriptsRoot ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+    set(pythonScriptsRoot ${MERNEL_ROOT}/cmake)
 
     set(outCheckFiles)
     foreach(file ${sources})
