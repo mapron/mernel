@@ -150,6 +150,7 @@ function(AddTarget)
     set(__one_val_optional
         OUTPUT_NAME         #
         OUTPUT_PREFIX       #
+        WIN_ICON            # path to .ico file
         )
     set(__multi_val
         COMPILE_OPTIONS                # TARGET_COMPILE_OPTIONS(PRIVATE/INTERFACE)
@@ -255,5 +256,13 @@ function(AddTarget)
     if (MSVC AND ARG_STATIC_RUNTIME)
         target_link_libraries(${name} PRIVATE optimized libcmt.lib debug libcmtd.lib)
         target_compile_options(${name} PRIVATE $<$<CONFIG:Debug>:/MTd>$<$<CONFIG:Release>:/MT>)
+    endif()
+
+    if (WIN32 AND ARG_WIN_ICON)
+        set(APP_ICON ${ARG_WIN_ICON})
+
+        set(RC_FILE ${CMAKE_BINARY_DIR}/CMakeFiles/${ARG_NAME}.dir/winAppIcon.rc)
+        configure_file(${MERNEL_ROOT}/cmake/winAppIcon.rc.in ${RC_FILE})
+        target_sources(${ARG_NAME} PRIVATE ${RC_FILE})
     endif()
 endfunction()

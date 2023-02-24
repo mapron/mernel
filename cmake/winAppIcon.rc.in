@@ -1,0 +1,4 @@
+#include <winver.h>
+#include <windows.h>
+
+IDI_ICON1  ICON  "${APP_ICON}"
