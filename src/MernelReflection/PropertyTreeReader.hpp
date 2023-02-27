@@ -15,22 +15,21 @@
 namespace Mernel::Reflection {
 
 template<class T>
-concept HasFromJsonRead = requires(T t, const PropertyTree& data)
-{
-    t.convertFromJson(data);
-};
+concept HasFromJsonRead = requires(T t, const PropertyTree& data) {
+                              t.convertFromJson(data);
+                          };
 template<class T>
-concept HasFromJsonReadGlobal = !PropertyTreeScalarHeld<T> && requires(T t, const PropertyTree& data)
-{
-    convertFromJson(data, t);
-};
+concept HasFromJsonReadGlobal = !
+PropertyTreeScalarHeld<T>&& requires(T t, const PropertyTree& data) {
+                                convertFromJson(data, t);
+                            };
 template<class T>
-concept HasFromStringRead = requires(T t, const std::string& data)
-{
-    t.fromString(data);
-};
+concept HasFromStringRead = requires(T t, const std::string& data) {
+                                t.fromString(data);
+                            };
 template<typename T>
-concept HasFieldsForRead = HasFields<T> && !HasCustomTransformRead<T> && !HasFromStringRead<T> && !HasFromJsonRead<T>;
+concept HasFieldsForRead = HasFields<T> && !
+HasCustomTransformRead<T> && !HasFromStringRead<T> && !HasFromJsonRead<T>;
 
 template<class CustomReader>
 class PropertyTreeReaderBase {

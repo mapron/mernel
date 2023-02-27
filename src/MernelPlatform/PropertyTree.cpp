@@ -204,7 +204,7 @@ void PropertyTree::dump(std::ostream& stream, const DumpParams& params, int leve
     if (isList()) {
         const bool isFlatList = checkFlatList(getList());
         stream << padBase << '[' << (isFlatList ? "" : "\n");
-        for (size_t index = 0, count = getList().size(); const auto &child : getList()) {
+        for (size_t index = 0, count = getList().size(); const auto& child : getList()) {
             //const bool simpleValue = isFlatList || child.isNull() || child.isScalar();
             child.dump(stream, params, isFlatList ? 0 : level + 1);
 

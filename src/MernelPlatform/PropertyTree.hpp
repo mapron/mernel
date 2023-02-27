@@ -27,11 +27,11 @@ concept PropertyTreeScalarHeld = PropertyTreeIntegral<T> || PropertyTreeFloating
 
 class MERNELPLATFORM_EXPORT PropertyTreeScalar {
 public:
-    PropertyTreeScalar()                          = default;
-    PropertyTreeScalar(const PropertyTreeScalar&) = default;
+    PropertyTreeScalar()                                     = default;
+    PropertyTreeScalar(const PropertyTreeScalar&)            = default;
     PropertyTreeScalar& operator=(const PropertyTreeScalar&) = default;
 
-    PropertyTreeScalar(PropertyTreeScalar&&) noexcept = default;
+    PropertyTreeScalar(PropertyTreeScalar&&) noexcept               = default;
     PropertyTreeScalar& operator=(PropertyTreeScalar&& rh) noexcept = default;
 
     explicit PropertyTreeScalar(PropertyTreeIntegral auto value)
@@ -94,11 +94,11 @@ using PropertyTreeScalarMap = std::map<std::string, PropertyTreeScalar>;
 
 class MERNELPLATFORM_EXPORT PropertyTree {
 public:
-    PropertyTree()                    = default;
-    PropertyTree(const PropertyTree&) = default;
+    PropertyTree()                               = default;
+    PropertyTree(const PropertyTree&)            = default;
     PropertyTree& operator=(const PropertyTree&) = default;
 
-    PropertyTree(PropertyTree&&) noexcept = default;
+    PropertyTree(PropertyTree&&) noexcept               = default;
     PropertyTree& operator=(PropertyTree&& rh) noexcept = default;
 
     // making this explicit will be very inconvenient.

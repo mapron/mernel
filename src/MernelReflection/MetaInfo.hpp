@@ -33,11 +33,11 @@ struct is_array<std::array<T, N>> : std::true_type {};
 
 template<typename T>
 concept IsMap = std::same_as<T, std::map<typename T::key_type, typename T::mapped_type, typename T::key_compare, typename T::allocator_type>> //
-    || std::same_as<T, std::unordered_map<typename T::key_type, typename T::mapped_type, typename T::hasher, typename T::key_equal, typename T::allocator_type>>;
+                || std::same_as<T, std::unordered_map<typename T::key_type, typename T::mapped_type, typename T::hasher, typename T::key_equal, typename T::allocator_type>>;
 
 template<typename T>
 concept IsSet = std::same_as<T, std::set<typename T::key_type, typename T::key_compare, typename T::allocator_type>> //
-    || std::same_as<T, std::unordered_set<typename T::key_type, typename T::hasher, typename T::key_equal, typename T::allocator_type>>;
+                || std::same_as<T, std::unordered_set<typename T::key_type, typename T::hasher, typename T::key_equal, typename T::allocator_type>>;
 
 template<typename T>
 concept IsStdArray = details::is_array<T>::value;
@@ -49,45 +49,45 @@ template<typename T>
 concept IsStdVector = std::same_as<T, std::vector<typename T::value_type, typename T::allocator_type>>;
 
 template<typename T>
-concept IsSequentalContainer = std::same_as<T, std::deque<typename T::value_type, typename T::allocator_type>> //
-    || std::same_as<T, std::list<typename T::value_type, typename T::allocator_type>>                          //
-    || IsStdVector<T> || IsStdArray<T>;
+concept IsSequentalContainer = std::same_as<T, std::deque<typename T::value_type, typename T::allocator_type>>   //
+                               || std::same_as<T, std::list<typename T::value_type, typename T::allocator_type>> //
+                               || IsStdVector<T> || IsStdArray<T>;
 
 template<typename T>
 concept NonAssociative = IsSequentalContainer<T> || IsSet<T>;
 
-namespace details
+namespace details {
+template<class T>
+static inline constexpr bool is_comparable() noexcept
 {
-    template<class T>
-    static inline constexpr bool is_comparable() noexcept
-    {
-        return false;
-    }
-    template<std::equality_comparable T>
-    requires(!(IsMap<T> || IsSet<T> || IsStdOptional<T> || IsSequentalContainer<T>) ) static inline constexpr bool is_comparable() noexcept
-    {
-        return true;
-    }
-    template<IsSequentalContainer T>
-    static inline constexpr bool is_comparable() noexcept
-    {
-        return is_comparable<typename T::value_type>();
-    }
-    template<IsStdOptional T>
-    static inline constexpr bool is_comparable() noexcept
-    {
-        return is_comparable<typename T::value_type>();
-    }
-    template<IsSet T>
-    static inline constexpr bool is_comparable() noexcept
-    {
-        return is_comparable<typename T::key_type>();
-    }
-    template<IsMap T>
-    static inline constexpr bool is_comparable() noexcept
-    {
-        return is_comparable<typename T::key_type>() && is_comparable<typename T::mapped_type>();
-    }
+    return false;
+}
+template<std::equality_comparable T>
+    requires(!(IsMap<T> || IsSet<T> || IsStdOptional<T> || IsSequentalContainer<T>) )
+static inline constexpr bool is_comparable() noexcept
+{
+    return true;
+}
+template<IsSequentalContainer T>
+static inline constexpr bool is_comparable() noexcept
+{
+    return is_comparable<typename T::value_type>();
+}
+template<IsStdOptional T>
+static inline constexpr bool is_comparable() noexcept
+{
+    return is_comparable<typename T::value_type>();
+}
+template<IsSet T>
+static inline constexpr bool is_comparable() noexcept
+{
+    return is_comparable<typename T::key_type>();
+}
+template<IsMap T>
+static inline constexpr bool is_comparable() noexcept
+{
+    return is_comparable<typename T::key_type>() && is_comparable<typename T::mapped_type>();
+}
 }
 
 struct MetaInfo {
@@ -311,7 +311,8 @@ template<typename T>
 concept HasCustomTransformWrite = s_useCustomTransformWrite<T>;
 
 template<typename T>
-concept HasFields = !std::is_same_v<std::remove_cvref_t<decltype(MetaInfo::MetaFields<T>::s_fields)>, bool>;
+concept HasFields = !
+std::is_same_v<std::remove_cvref_t<decltype(MetaInfo::MetaFields<T>::s_fields)>, bool>;
 
 template<typename T>
 concept IsStringMap = IsMap<T> && s_isStringMap<T>;

@@ -90,7 +90,7 @@ private:
 
     void flush();
 
-    Logger(const Logger&) = delete;
+    Logger(const Logger&)         = delete;
     void operator=(const Logger&) = delete;
     // move operations doesn't look evil.
 };

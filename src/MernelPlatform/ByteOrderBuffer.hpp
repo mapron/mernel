@@ -199,7 +199,7 @@ private:
     ByteOrderBuffer(ByteOrderBuffer&& another)      = delete;
 
     ByteOrderBuffer& operator=(const ByteOrderBuffer& another) = delete;
-    ByteOrderBuffer& operator=(ByteOrderBuffer&& another) = delete;
+    ByteOrderBuffer& operator=(ByteOrderBuffer&& another)      = delete;
 
     void setMaximumSize(size_t maxSize)
     {

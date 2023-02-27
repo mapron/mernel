@@ -16,26 +16,22 @@ namespace Mernel {
 class ByteOrderDataStreamReader;
 class ByteOrderDataStreamWriter;
 template<class T>
-concept HasRead = requires(T t, ByteOrderDataStreamReader& reader)
-{
-    t.readBinary(reader);
-};
+concept HasRead = requires(T t, ByteOrderDataStreamReader& reader) {
+                      t.readBinary(reader);
+                  };
 template<class T>
-concept HasWrite = requires(T t, ByteOrderDataStreamWriter& writer)
-{
-    t.writeBinary(writer);
-};
+concept HasWrite = requires(T t, ByteOrderDataStreamWriter& writer) {
+                       t.writeBinary(writer);
+                   };
 
 template<class T>
-concept HasGlobalRead = requires(T t, ByteOrderDataStreamReader& reader)
-{
-    readBinary(reader, t);
-};
+concept HasGlobalRead = requires(T t, ByteOrderDataStreamReader& reader) {
+                            readBinary(reader, t);
+                        };
 template<class T>
-concept HasGlobalWrite = requires(T t, ByteOrderDataStreamWriter& writer)
-{
-    writeBinary(writer, t);
-};
+concept HasGlobalWrite = requires(T t, ByteOrderDataStreamWriter& writer) {
+                             writeBinary(writer, t);
+                         };
 
 inline constexpr uint_fast8_t createByteorderMask(uint_fast8_t endiannes8, uint_fast8_t endiannes16, uint_fast8_t endiannes32)
 {
@@ -107,7 +103,7 @@ protected:
     ByteOrderDataStream(ByteOrderDataStream&& another)      = delete;
 
     ByteOrderDataStream& operator=(const ByteOrderDataStream& another) = delete;
-    ByteOrderDataStream& operator=(ByteOrderDataStream&& another) = delete;
+    ByteOrderDataStream& operator=(ByteOrderDataStream&& another)      = delete;
 
     ByteOrderBuffer& m_buf;
     uint_fast8_t     m_maskInt8;
