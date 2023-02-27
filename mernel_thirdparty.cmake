@@ -36,6 +36,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/3rdparty/googletest/googletest)
 
+if(WIN32)
 # 7-zip
 AddTarget(TYPE static NAME 7zip_static
     SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/3rdparty/7zip
@@ -43,3 +44,4 @@ AddTarget(TYPE static NAME 7zip_static
     SKIP_STATIC_CHECK
     STATIC_RUNTIME
 )
+endif()
