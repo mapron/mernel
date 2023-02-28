@@ -16,6 +16,7 @@
 #include <list>
 #include <deque>
 #include <array>
+#include <string>
 
 #include <frozen/string.h>
 

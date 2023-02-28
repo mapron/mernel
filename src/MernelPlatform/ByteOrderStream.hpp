@@ -11,6 +11,16 @@
 #include <deque>
 #include <map>
 #include <type_traits>
+#include <limits>
+
+/// Conflicts with "endian.h" in unix
+#ifdef BIG_ENDIAN
+#undef BIG_ENDIAN
+#endif
+
+#ifdef LITTLE_ENDIAN
+#undef LITTLE_ENDIAN
+#endif
 
 namespace Mernel {
 class ByteOrderDataStreamReader;

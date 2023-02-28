@@ -6,6 +6,7 @@
 #include "FileIOUtils.hpp"
 
 #include <fstream>
+#include <cstring>
 
 namespace Mernel {
 

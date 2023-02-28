@@ -1,4 +1,5 @@
 include_guard(GLOBAL)
+include(CheckCXXCompilerFlag)
 
 function(AddCompilerFlagIfSupported)
     foreach(instruction ${ARGN})
