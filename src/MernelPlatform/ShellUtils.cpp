@@ -96,11 +96,11 @@ bool showFolderInFileManager(const std_path&)
     return false;
 }
 
-bool Mernel::createShortCut(const std_path&    fromDir,
-                            const std::string& fromName,
-                            const std_path&    toDir,
-                            const std::string& toFilename,
-                            const std::string& extraArgs)
+bool createShortCut(const std_path&    fromDir,
+                    const std::string& fromName,
+                    const std_path&    toDir,
+                    const std::string& toFilename,
+                    const std::string& extraArgs)
 {
     return false;
 }

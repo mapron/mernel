@@ -11,6 +11,7 @@
 #include <deque>
 #include <map>
 #include <type_traits>
+#include <limits>
 
 namespace Mernel {
 class ByteOrderDataStreamReader;

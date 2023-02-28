@@ -69,7 +69,7 @@ std_path getExecutablePath()
         return std::string("./unknown");
 
     path[len] = '\0';
-    returnstd_path(path);
+    return std_path(path);
 #else
     WCHAR szFileName[MAX_PATH];
 
