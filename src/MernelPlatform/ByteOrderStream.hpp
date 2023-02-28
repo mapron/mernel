@@ -95,8 +95,8 @@ public:
         return { this, prev };
     }
 
-    static constexpr const uint_fast8_t BIG_ENDIAN    = createByteorderMask(ORDER_BE, ORDER_BE, ORDER_BE);
-    static constexpr const uint_fast8_t LITTLE_ENDIAN = createByteorderMask(ORDER_LE, ORDER_LE, ORDER_LE);
+    static constexpr const uint_fast8_t s_bigEndian    = createByteorderMask(ORDER_BE, ORDER_BE, ORDER_BE);
+    static constexpr const uint_fast8_t s_littleEndian = createByteorderMask(ORDER_LE, ORDER_LE, ORDER_LE);
 
 protected:
     ByteOrderDataStream(const ByteOrderDataStream& another) = delete;
