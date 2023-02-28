@@ -195,6 +195,7 @@ function(AddTarget)
             set(generateStub true)
         endif()
 
+        target_include_directories(${name} PRIVATE ${ARG_SOURCE_DIR})
         target_include_directories(${name} PRIVATE ${CMAKE_BINARY_DIR}/export)
         MakeTargetSources(${name} "${ARG_INCLUDES}" "${ARG_SOURCE_DIR}" ${useQt} ${generateStub} "${ARG_EXTRA_SOURCES}" "${ARG_EXCLUDE_SOURCES}" "${ARG_UIC_POSTPROCESS_SCRIPTS}")
         if (NOT ARG_SKIP_STATIC_CHECK)
