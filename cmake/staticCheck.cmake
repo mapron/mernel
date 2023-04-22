@@ -39,14 +39,10 @@ function(AddStaticCheckTarget)
     foreach(file ${sources})
         string(REPLACE "${ARG_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/StaticCheck${ARG_TARGET_NAME}" outFile "${file}")
         set(outCheckFile ${outFile}.check)
-        set(checkCommands)
-        list(APPEND checkCommands
-            COMMAND ${Python3_EXECUTABLE} ${pythonScriptsRoot}/clangFormat.py -i ${file} -f ${CLANG_FORMAT_COMMAND}
-            )
 
         add_custom_command(
             OUTPUT ${outCheckFile}
-            ${checkCommands}
+            COMMAND ${Python3_EXECUTABLE} ${pythonScriptsRoot}/clangFormat.py -i ${file} -f ${CLANG_FORMAT_COMMAND}
             COMMAND ${CMAKE_COMMAND} -E touch ${outCheckFile}
             DEPENDS ${file}
             )
