@@ -44,6 +44,8 @@ function(AddStaticCheckTarget)
             COMMAND ${Python3_EXECUTABLE} ${pythonScriptsRoot}/clangFormat.py -i ${file} -f ${CLANG_FORMAT_COMMAND}
             )
 
+        get_filename_component(outDir ${outFile} DIRECTORY)
+        file(MAKE_DIRECTORY ${outDir})
         add_custom_command(
             OUTPUT ${outCheckFile}
             ${checkCommands}
