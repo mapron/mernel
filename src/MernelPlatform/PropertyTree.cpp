@@ -115,6 +115,8 @@ void PropertyTreeScalar::print(std::ostream& os, bool addQuotes, bool escapeStri
 
     if (const auto* dval = std::get_if<double>(&m_data); dval) {
         os << *dval;
+        if (int(*dval) == *dval)
+            os << ".0";
         return;
     }
     if (const auto* sval = std::get_if<std::string>(&m_data); sval) {
