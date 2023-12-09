@@ -28,6 +28,11 @@ public:
     void        printToStdErr() const;
     std::string printToStr() const;
 
+    static void setLoggingEnabled(bool state) { s_enableLogging = state; }
+
+private:
+    static bool s_enableLogging;
+
 private:
     struct Impl;
     std::unique_ptr<Impl> m_impl;
@@ -42,7 +47,8 @@ public:
     explicit ScopeTimer(int64_t& out);
     ~ScopeTimer();
     void    reset();
-    int64_t elapsed() const noexcept;
+    int64_t elapsedUS() const noexcept;
+    int64_t elapsedNano() const noexcept;
 };
 
 class MERNELPLATFORM_EXPORT ProfilerScope {

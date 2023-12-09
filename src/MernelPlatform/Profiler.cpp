@@ -11,22 +11,56 @@
 #include <sstream>
 #include <map>
 #include <deque>
+#include <array>
+#include <compare>
 
 #define FH_ENABLE_GLOBAL_PROFILER_CONTEXT 1
 
-#ifdef NDEBUG
-#define FH_ENABLE_PROFILER_LOGGING 1
-#endif
-
 namespace Mernel {
+
+bool ProfilerContext::s_enableLogging = false;
+
+struct LightStringList {
+    std::array<std::string_view, 8> m_data;
+    size_t                          m_size = 0;
+
+    static constexpr const std::string_view s_undefined = "???";
+
+    constexpr void push(std::string_view value)
+    {
+        if (m_size < m_data.size() - 1) {
+            m_data[m_size] = value;
+        }
+        m_size++;
+    }
+    constexpr void pop()
+    {
+        if (!m_size)
+            return;
+        m_size--;
+        m_data[m_size] = {};
+    }
+
+    std::string toString(const std::string& glue) const
+    {
+        if (!m_size)
+            return {};
+        std::string result(m_data[0]);
+        for (size_t i = 1; i < m_size; ++i)
+            result = result + glue + std::string(i < m_data.size() ? m_data[i] : s_undefined);
+        return result;
+    }
+
+    constexpr auto operator<=>(const LightStringList&) const noexcept = default;
+};
 
 struct ProfilerContext::Impl {
     struct Rec {
-        int64_t us    = 0;
+        int64_t ns    = 0;
         int     calls = 0;
-        void    add(int64_t v)
+        void    add(int64_t valueNS)
         {
-            us += v;
+            ns += valueNS;
             calls++;
         }
     };
@@ -34,37 +68,57 @@ struct ProfilerContext::Impl {
     void printTo(std::ostream& os)
     {
         for (auto& p : all) {
-            os << p.first << "=" << (p.second.us / 1000) << " #" << (p.second.calls) << "\n";
+            os << p.first.toString("->") << "=" << (p.second.ns / 1000000) << " #" << (p.second.calls) << "\n";
         }
     }
 
     void pushPrefix(std::string_view key)
     {
-        stackPrefix += std::string{ key } + "->";
-        stack.push_back(stackPrefix);
-#ifdef FH_ENABLE_PROFILER_LOGGING
-        Logger(Logger::Debug) << stackPrefix;
-#endif
+        stackPrefix.push(key);
+        if (s_enableLogging)
+            Logger(Logger::Debug) << stackPrefix.toString("->");
     }
-    void addRecord(std::string_view key, int64_t value)
+    void addRecord(LightStringList key, int64_t valueNS)
     {
-        std::string keyFull = stackPrefix + std::string(key);
-        all[std::move(keyFull)].add(value);
-#ifdef FH_ENABLE_PROFILER_LOGGING
-        Logger(Logger::Debug) << "/ " << stackPrefix;
-#endif
+        if (0) {
+            all[key].add(valueNS);
+            return;
+        }
+        if (last != RecordMap::iterator{} && last->first == key) {
+            last->second.add(valueNS);
+            return;
+        }
+        RecordMap::iterator existing = all.find(key);
+        if (existing != all.end()) {
+            existing->second.add(valueNS);
+            last = existing;
+            return;
+        }
+        auto [it, _] = all.insert(std::pair{ key, Rec{} });
+        it->second.add(valueNS);
+        last = it;
+    }
+    void addRecord(std::string_view key, int64_t valueNS)
+    {
+        LightStringList list;
+        list.push(key);
+        addRecord(list, valueNS);
     }
 
-    void pop(std::string_view key, int64_t value)
+    void pop(int64_t value)
     {
-        stack.pop_back();
-        stackPrefix = stack.empty() ? "" : stack.back();
+        LightStringList key = stackPrefix;
+
+        if (s_enableLogging)
+            Logger(Logger::Debug) << "/ " << key.toString("->");
+        stackPrefix.pop();
         addRecord(key, value);
     }
 
-    std::map<std::string, Rec> all{};
-    std::deque<std::string>    stack;
-    std::string                stackPrefix;
+    using RecordMap = std::map<LightStringList, Rec>;
+    RecordMap::iterator last{};
+    RecordMap           all{};
+    LightStringList     stackPrefix;
 };
 
 ProfilerContext::ProfilerContext()
@@ -76,13 +130,12 @@ ProfilerContext::~ProfilerContext() = default;
 
 void ProfilerContext::addRecord(std::string_view key, int64_t ms)
 {
-    m_impl->addRecord(key, ms * 1000);
+    m_impl->addRecord(key, ms * 1000000);
 }
 void ProfilerContext::clearAll()
 {
     m_impl->all.clear();
-    m_impl->stack.clear();
-    m_impl->stackPrefix.clear();
+    m_impl->stackPrefix.m_size = 0;
 }
 
 void ProfilerContext::printToStdErr() const
@@ -99,9 +152,9 @@ std::string ProfilerContext::printToStr() const
 
 namespace {
 
-int64_t curUS()
+int64_t curNS()
 {
-    return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }
 
 ProfilerContext* defaultContext = nullptr;
@@ -124,13 +177,13 @@ ProfilerContext* getDefaultContext()
 }
 
 ScopeTimer::ScopeTimer()
-    : start(curUS())
+    : start(curNS())
     , out(nullptr)
 {
 }
 
 ScopeTimer::ScopeTimer(int64_t& out)
-    : start(curUS())
+    : start(curNS())
     , out(&out)
 {
 }
@@ -138,17 +191,22 @@ ScopeTimer::ScopeTimer(int64_t& out)
 ScopeTimer::~ScopeTimer()
 {
     if (out)
-        *out = elapsed();
+        *out = elapsedUS();
 }
 
 void ScopeTimer::reset()
 {
-    start = curUS();
+    start = curNS();
 }
 
-int64_t ScopeTimer::elapsed() const noexcept
+int64_t ScopeTimer::elapsedUS() const noexcept
 {
-    return curUS() - start;
+    return (curNS() - start) / 1000;
+}
+
+int64_t ScopeTimer::elapsedNano() const noexcept
+{
+    return (curNS() - start);
 }
 
 ProfilerScope::ProfilerScope(std::string_view key, bool nested)
@@ -175,9 +233,9 @@ ProfilerScope::~ProfilerScope()
         return;
 
     if (nested)
-        context->m_impl->pop(key, timer.elapsed());
+        context->m_impl->pop(timer.elapsedNano());
     else
-        context->m_impl->addRecord(key, timer.elapsed());
+        context->m_impl->addRecord(key, timer.elapsedNano());
 }
 
 void ProfilerScope::printToStdErr()
