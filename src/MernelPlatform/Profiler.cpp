@@ -80,23 +80,13 @@ struct ProfilerContext::Impl {
     }
     void addRecord(LightStringList key, int64_t valueNS)
     {
-        if (0) {
-            all[key].add(valueNS);
+        if (lastRecord && lastKey == key) {
+            lastRecord->add(valueNS);
             return;
         }
-        if (last != RecordMap::iterator{} && last->first == key) {
-            last->second.add(valueNS);
-            return;
-        }
-        RecordMap::iterator existing = all.find(key);
-        if (existing != all.end()) {
-            existing->second.add(valueNS);
-            last = existing;
-            return;
-        }
-        auto [it, _] = all.insert(std::pair{ key, Rec{} });
-        it->second.add(valueNS);
-        last = it;
+        lastRecord = &all[key];
+        lastRecord->add(valueNS);
+        lastKey = key;
     }
     void addRecord(std::string_view key, int64_t valueNS)
     {
@@ -116,9 +106,11 @@ struct ProfilerContext::Impl {
     }
 
     using RecordMap = std::map<LightStringList, Rec>;
-    RecordMap::iterator last{};
-    RecordMap           all{};
-    LightStringList     stackPrefix;
+
+    RecordMap       all{};
+    Rec*            lastRecord = nullptr;
+    LightStringList lastKey;
+    LightStringList stackPrefix;
 };
 
 ProfilerContext::ProfilerContext()
