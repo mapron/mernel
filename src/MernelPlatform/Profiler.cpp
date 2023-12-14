@@ -127,6 +127,7 @@ void ProfilerContext::addRecord(std::string_view key, int64_t ms)
 void ProfilerContext::clearAll()
 {
     m_impl->all.clear();
+    m_impl->lastRecord         = nullptr;
     m_impl->stackPrefix.m_size = 0;
 }
 
