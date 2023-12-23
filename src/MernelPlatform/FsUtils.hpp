@@ -33,4 +33,11 @@ inline std_path string2path(const std::string& str)
     return result;
 }
 
+inline std::string pathToLower(const std_path& path)
+{
+    std::string str = path2string(path);
+    std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) { return std::tolower(c); });
+    return str;
+}
+
 }
