@@ -26,6 +26,15 @@ concept HasWrite = requires(T t, ByteOrderDataStreamWriter& writer) {
                    };
 
 template<class T>
+concept HasReadUserData = requires(T t, ByteOrderDataStreamReader& reader) {
+                              t.readBinary(reader, nullptr);
+                          };
+template<class T>
+concept HasWriteUserData = requires(T t, ByteOrderDataStreamWriter& writer) {
+                               t.writeBinary(writer, nullptr);
+                           };
+
+template<class T>
 concept HasGlobalRead = requires(T t, ByteOrderDataStreamReader& reader) {
                             readBinary(reader, t);
                         };
@@ -83,6 +92,16 @@ public:
         return 0;
     }
 
+    inline void setUserData(void* userData)
+    {
+        m_userData = userData;
+    }
+    template<class T>
+    inline T* getUserData() const
+    {
+        return reinterpret_cast<T*>(m_userData);
+    }
+
     struct SizeGuard {
         ByteOrderDataStream* m_parent   = nullptr;
         uint_fast8_t         m_prevSize = 0;
@@ -114,6 +133,7 @@ protected:
     uint_fast8_t     m_maskFloat;
     uint_fast8_t     m_maskDouble;
     uint_fast8_t     m_containerSizeBytes{ 4 };
+    void*            m_userData = nullptr;
 };
 
 class ByteOrderDataStreamReader : public ByteOrderDataStream {
@@ -146,6 +166,11 @@ public:
     inline ByteOrderDataStreamReader& operator>>(HasRead auto& data)
     {
         data.readBinary(*this);
+        return *this;
+    }
+    inline ByteOrderDataStreamReader& operator>>(HasReadUserData auto& data)
+    {
+        data.readBinary(*this, m_userData);
         return *this;
     }
     inline ByteOrderDataStreamReader& operator>>(HasGlobalRead auto& data)
@@ -344,6 +369,11 @@ public:
     inline ByteOrderDataStreamWriter& operator<<(const HasWrite auto& data)
     {
         data.writeBinary(*this);
+        return *this;
+    }
+    inline ByteOrderDataStreamWriter& operator<<(const HasWriteUserData auto& data)
+    {
+        data.writeBinary(*this, m_userData);
         return *this;
     }
     inline ByteOrderDataStreamWriter& operator<<(const HasGlobalWrite auto& data)
