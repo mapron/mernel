@@ -20,7 +20,7 @@
 
 namespace Mernel {
 
-class AbstractLoggerBackend : public ILoggerBackend {
+class MERNELPLATFORM_EXPORT AbstractLoggerBackend : public ILoggerBackend {
 public:
     AbstractLoggerBackend(int  maxLogLevel,
                           bool outputLoglevel,
@@ -36,7 +36,7 @@ public:
         m_startTime = ChronoPoint(true);
     }
 
-    bool LogEnabled(int logLevel) const override { return logLevel <= m_maxLogLevel; }
+    bool LogEnabled(int logLevel) const override;
 
     void FlushMessage(const std::string& message, int logLevel) const override
     {

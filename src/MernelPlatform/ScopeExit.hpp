@@ -29,10 +29,10 @@ static constexpr ScopeExitFunctionWrapper<F> createScopeExitFunctionWrapper(cons
     return ScopeExitFunctionWrapper<F>(f);
 }
 
-} // namespace Movavi
-#define FH_DO_STRING_JOIN2(arg1, arg2) arg1##arg2
-#define FH_STRING_JOIN2(arg1, arg2) FH_DO_STRING_JOIN2(arg1, arg2) // concat hack
+}
+#define MERNEL_DO_STRING_JOIN2(arg1, arg2) arg1##arg2
+#define MERNEL_STRING_JOIN2(arg1, arg2) MERNEL_DO_STRING_JOIN2(arg1, arg2) // concat hack
 
-#define FH_SCOPE_EXIT(...) \
-    auto FH_STRING_JOIN2(scope_exit_, __LINE__) = Mernel::details::createScopeExitFunctionWrapper(__VA_ARGS__); \
-    (void) FH_STRING_JOIN2(scope_exit_, __LINE__)
+#define MERNEL_SCOPE_EXIT(...) \
+    auto MERNEL_STRING_JOIN2(scope_exit_, __LINE__) = Mernel::details::createScopeExitFunctionWrapper(__VA_ARGS__); \
+    (void) MERNEL_STRING_JOIN2(scope_exit_, __LINE__)

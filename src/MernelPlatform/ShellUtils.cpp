@@ -54,7 +54,7 @@ bool createShortCut(const std_path&    fromDir,
         CoInitialize(NULL);
         hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (void**) &psl);
     }
-    FH_SCOPE_EXIT([&psl, neededCoInit] {
+    MERNEL_SCOPE_EXIT([&psl, neededCoInit] {
         if (psl)
             psl->Release();
         if (neededCoInit)
@@ -72,7 +72,7 @@ bool createShortCut(const std_path&    fromDir,
 
     IPersistFile* ppf = nullptr;
     hres              = psl->QueryInterface(IID_IPersistFile, (void**) &ppf);
-    FH_SCOPE_EXIT([&ppf] {
+    MERNEL_SCOPE_EXIT([&ppf] {
         if (ppf)
             ppf->Release();
     });

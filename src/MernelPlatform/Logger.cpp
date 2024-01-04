@@ -17,7 +17,14 @@
 
 namespace Mernel {
 
+namespace {
 std::unique_ptr<ILoggerBackend> g_loggerBackend(new LoggerBackendConsole(Logger::Notice, false, false, false, LoggerBackendConsole::Type::Cout));
+}
+
+inline bool AbstractLoggerBackend::LogEnabled(int logLevel) const
+{
+    return logLevel <= m_maxLogLevel;
+}
 
 void Logger::SetLoggerBackend(std::unique_ptr<ILoggerBackend>&& backend)
 {
@@ -26,19 +33,19 @@ void Logger::SetLoggerBackend(std::unique_ptr<ILoggerBackend>&& backend)
 
 bool Logger::IsLogLevelEnabled(int logLevel)
 {
-    return g_loggerBackend->LogEnabled(logLevel);
+    return g_loggerBackend && g_loggerBackend->LogEnabled(logLevel);
 }
 
 Logger::Logger(int logLevel)
     : m_logLevel(logLevel)
 {
-    if (g_loggerBackend->LogEnabled(logLevel))
+    if (g_loggerBackend && g_loggerBackend->LogEnabled(logLevel))
         m_stream = std::make_unique<std::ostringstream>();
 }
 
 Logger::Logger(const std::string& context, int logLevel)
 {
-    if (g_loggerBackend->LogEnabled(logLevel)) {
+    if (g_loggerBackend && g_loggerBackend->LogEnabled(logLevel)) {
         m_stream = std::make_unique<std::ostringstream>();
         if (!context.empty())
             *m_stream << "{" << context << "} ";
@@ -47,7 +54,7 @@ Logger::Logger(const std::string& context, int logLevel)
 
 Logger::~Logger()
 {
-    if (m_stream)
+    if (m_stream && g_loggerBackend)
         g_loggerBackend->FlushMessage(m_stream->str(), m_logLevel);
 }
 
