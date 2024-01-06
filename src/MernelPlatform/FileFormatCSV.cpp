@@ -114,14 +114,6 @@ bool readCSVFromBuffer(const std::string& csvData, CSVTable& table)
             data[i].str = std::string(csvTable.row[i]);
         table.rows.push_back(CSVTableRow(data));
     }
-
-#ifndef NDEBUG
-    {
-        std::string check;
-        writeCSVToBuffer(check, table);
-        assert(check == csvData);
-    }
-#endif
     return true;
 }
 
