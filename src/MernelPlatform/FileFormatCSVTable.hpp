@@ -56,6 +56,8 @@ struct MERNELPLATFORM_EXPORT CSVTableRow {
 struct MERNELPLATFORM_EXPORT CSVTable {
     std::deque<CSVTableRow>  rows;
     std::vector<std::string> columns;
+    bool                     useColumns = true;
+    bool                     endsWithNL = false;
 
     int indexOf(const std::string& col) const;
 };

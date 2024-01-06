@@ -70,31 +70,42 @@ public:
 
 bool writeCSVToBuffer(std::string& csvData, const CSVTable& table)
 {
-    for (size_t i = 0; i < table.columns.size(); ++i) {
-        if (i > 0)
-            csvData += '\t';
-        csvData += table.columns[i];
+    csvData.clear();
+    if (table.useColumns) {
+        for (size_t i = 0; i < table.columns.size(); ++i) {
+            if (i > 0)
+                csvData += '\t';
+            csvData += table.columns[i];
+        }
+        csvData += "\r\n";
     }
-    csvData += "\r\n";
-    for (const auto& row : table.rows) {
+    for (size_t rowIndex = 0; const auto& row : table.rows) {
+        if (rowIndex > 0)
+            csvData += "\r\n";
         for (size_t i = 0; i < row.data.size(); ++i) {
             if (i > 0)
                 csvData += '\t';
             csvData += row.data[i].str;
         }
-        csvData += "\r\n";
+        rowIndex++;
     }
+    if (table.endsWithNL)
+        csvData += "\r\n";
     return true;
 }
 
 bool readCSVFromBuffer(const std::string& csvData, CSVTable& table)
 {
     FastCsvTable csvTable(csvData.data(), csvData.size());
-    if (!csvTable.scanLine())
-        return false;
-    table.columns.resize(csvTable.row.size());
-    for (size_t i = 0; i < csvTable.row.size(); ++i)
-        table.columns[i] = std::string(csvTable.row[i]);
+
+    if (table.useColumns) {
+        if (!csvTable.scanLine())
+            return false;
+        table.columns.resize(csvTable.row.size());
+        for (size_t i = 0; i < csvTable.row.size(); ++i)
+            table.columns[i] = std::string(csvTable.row[i]);
+    }
+    table.endsWithNL = csvData.ends_with('\n');
 
     std::vector<CSVTableCell> data;
     while (csvTable.scanLine()) {
