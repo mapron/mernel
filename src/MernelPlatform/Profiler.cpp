@@ -51,7 +51,12 @@ struct LightStringList {
         return result;
     }
 
-    constexpr auto operator<=>(const LightStringList&) const noexcept = default;
+    constexpr auto asTuple() const noexcept { return std::tie(m_data, m_size); }
+    constexpr bool operator==(const LightStringList& rh) const noexcept { return asTuple() == rh.asTuple(); }
+    constexpr bool operator<(const LightStringList& rh) const noexcept { return asTuple() < rh.asTuple(); }
+
+    // libc++ bug: std::array missing <=>
+    //constexpr auto operator<=>(const LightStringList&) const noexcept = default;
 };
 
 struct ProfilerContext::Impl {
