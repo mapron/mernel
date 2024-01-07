@@ -17,7 +17,7 @@ function(AddStaticCheckTarget)
         return()
     endif()
 
-    if ((NOT CLANG_FORMAT_COMMAND) OR (NOT Python3_EXECUTABLE))
+    if ((NOT CLANG_FORMAT_COMMAND) OR (NOT Python3_EXECUTABLE) OR (DISABLE_STATIC_CHECKS))
         return()
     endif()
 
