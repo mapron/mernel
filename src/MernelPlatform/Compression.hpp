@@ -18,7 +18,7 @@ enum class CompressionType
     None,
     Gzip,
     Zlib, // only differs in window
-    ZStd, // unsupported yet.
+    ZStd,
 };
 
 struct CompressionInfo {

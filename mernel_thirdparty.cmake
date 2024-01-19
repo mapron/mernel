@@ -45,3 +45,15 @@ AddTarget(TYPE static NAME 7zip_static
     STATIC_RUNTIME
 )
 endif()
+
+# Zstd
+AddTarget(TYPE static NAME zstd_static 
+    SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/3rdparty/zstd/lib
+    EXPORT_INCLUDES
+    SKIP_STATIC_CHECK
+    EXCLUDE_SOURCES legacy dictBuilder deprecated
+    INCLUDES ${CMAKE_CURRENT_LIST_DIR}/3rdparty/zstd/lib/common/
+    DEFINES ZSTD_DISABLE_ASM
+    INTERFACE_COMPILE_DEFINITIONS USE_ZSTD
+    )
+

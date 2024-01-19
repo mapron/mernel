@@ -1,0 +1,7 @@
+#pragma once
+
+#if defined (__GNUC__)
+	#define @DEFINITION_NAME@ __attribute__((visibility("default")))
+#else
+	#define @DEFINITION_NAME@
+#endif
