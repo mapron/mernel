@@ -91,14 +91,21 @@ function(MakeTarget name type excludeAll)
     endif()
 endfunction()
 
-function(MakeTargetSources name includes sourceDir useQt generateStub extraSources excludeSources extraPostprocess)
-    file(GLOB_RECURSE globbedFiles "${sourceDir}/[^.]*" )
+function(MakeTargetSources name skipGlob includes sourceDir useQt generateStub extraSources extraGlob excludeSources extraPostprocess)
+    set(globbedFiles)
+    if (NOT skipGlob)
+        file(GLOB_RECURSE globbedFiles "${sourceDir}/[^.]*" )
+    endif()
+    foreach(pattern ${extraGlob})
+        file(GLOB globbedFilesTmp "${sourceDir}/${pattern}" )
+        list(APPEND globbedFiles ${globbedFilesTmp})
+    endforeach()
     list(APPEND globbedFiles ${extraSources})
     filterSources(globbedFiles ${excludeSources})
     set(headers ${globbedFiles})
     set(sources ${globbedFiles})
     list(FILTER headers INCLUDE REGEX "\\.(h|hpp)$")
-    list(FILTER sources INCLUDE REGEX "\\.(c|cpp|cxx|mm|m)$")
+    list(FILTER sources INCLUDE REGEX "\\.(c|cc|cpp|cxx|mm|m)$")
 
     if(useQt)
         set(forms ${globbedFiles})
@@ -149,6 +156,7 @@ function(AddTarget)
         STATIC_RUNTIME            # use static runtime (/MT) (MSVC)
         EXCLUDE_FROM_ALL          # 
         SKIP_STATIC_CHECK         #
+        SKIP_GLOB                 #
         )
     set(__one_val_required
         NAME                # 
@@ -171,6 +179,7 @@ function(AddTarget)
         INTERFACE_INCLUDES             # TARGET_INCLUDE_DIRECTORIES(INTERFACE)
 
         EXTRA_SOURCES                  # 
+        EXTRA_GLOB                     # 
         EXCLUDE_SOURCES                # 
         QT_MODULES                     #
         UIC_POSTPROCESS_SCRIPTS        # 
@@ -193,7 +202,6 @@ function(AddTarget)
     )
 
     if (NOT (ARG_TYPE STREQUAL interface))
-        #function(MakeTargetSources name includes sourceDir useQt extraSources excludeSources extraPostprocess)
         set(useQt false)
         if(ARG_QT_MODULES)
             set(useQt true)
@@ -205,7 +213,7 @@ function(AddTarget)
 
         target_include_directories(${name} PRIVATE ${ARG_SOURCE_DIR})
         target_include_directories(${name} PRIVATE ${CMAKE_BINARY_DIR}/export)
-        MakeTargetSources(${name} "${ARG_INCLUDES}" "${ARG_SOURCE_DIR}" ${useQt} ${generateStub} "${ARG_EXTRA_SOURCES}" "${ARG_EXCLUDE_SOURCES}" "${ARG_UIC_POSTPROCESS_SCRIPTS}")
+        MakeTargetSources(${name} "${ARG_SKIP_GLOB}" "${ARG_INCLUDES}" "${ARG_SOURCE_DIR}" ${useQt} ${generateStub} "${ARG_EXTRA_SOURCES}" "${ARG_EXTRA_GLOB}" "${ARG_EXCLUDE_SOURCES}" "${ARG_UIC_POSTPROCESS_SCRIPTS}")
         if (NOT ARG_SKIP_STATIC_CHECK)
             AddStaticCheckTarget(TARGET_NAME ${name} SOURCE_DIR "${ARG_SOURCE_DIR}")
         endif()
