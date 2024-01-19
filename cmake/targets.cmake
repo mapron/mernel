@@ -157,6 +157,7 @@ function(AddTarget)
         EXCLUDE_FROM_ALL          # 
         SKIP_STATIC_CHECK         #
         SKIP_GLOB                 #
+        SKIP_INSTALL              #
         )
     set(__one_val_required
         NAME                # 
@@ -267,7 +268,7 @@ function(AddTarget)
     endif()
     
     set(installableTypes shared app_ui app_console app_bundle)
-    if (ARG_TYPE IN_LIST installableTypes AND NOT ARG_EXCLUDE_FROM_ALL)
+    if (ARG_TYPE IN_LIST installableTypes AND NOT ARG_EXCLUDE_FROM_ALL AND NOT ARG_SKIP_INSTALL)
         install(TARGETS ${name} RUNTIME DESTINATION bin)
     endif()
     if (MSVC AND ARG_STATIC_RUNTIME)
