@@ -53,7 +53,7 @@ AddTarget(TYPE static NAME zstd_static
     SKIP_STATIC_CHECK
     EXCLUDE_SOURCES legacy dictBuilder deprecated
     INCLUDES ${CMAKE_CURRENT_LIST_DIR}/3rdparty/zstd/lib/common/
-    DEFINES ZSTD_DISABLE_ASM
+    COMPILE_DEFINITIONS ZSTD_DISABLE_ASM
     INTERFACE_COMPILE_DEFINITIONS USE_ZSTD
     )
 

@@ -23,9 +23,9 @@ function(AddStaticCheckTarget)
 
     file(GLOB_RECURSE allFiles "${ARG_SOURCE_DIR}/[^.]*" )
     set(globHeaders ${allFiles})
-    list(FILTER globHeaders INCLUDE REGEX "\\.hpp$")
+    list(FILTER globHeaders INCLUDE REGEX "\\.(h|hpp)$")
     set(globSources ${allFiles})
-    list(FILTER globSources INCLUDE REGEX "\\.cpp$")
+    list(FILTER globSources INCLUDE REGEX "\\.(cc|cpp|cxx)$")
 
     set(sources ${globSources} ${globHeaders})
     if (NOT sources)
