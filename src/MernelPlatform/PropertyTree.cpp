@@ -6,6 +6,7 @@
 #include "PropertyTree.hpp"
 
 #include <iostream>
+#include <cstdint>
 
 namespace Mernel {
 

@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include <algorithm>
 #include <filesystem>
 
 namespace Mernel {
