@@ -101,12 +101,12 @@ struct MetaInfo {
 
     template<class Parent, class FieldType>
     struct Field {
-        constexpr Field(frozen::string name, FieldType Parent::*f)
+        constexpr Field(frozen::string name, FieldType Parent::* f)
             : m_name(name)
             , m_f(f)
         {}
         template<std::size_t N>
-        constexpr Field(size_t offset, char const (&data)[N], FieldType Parent::*f)
+        constexpr Field(size_t offset, char const (&data)[N], FieldType Parent::* f)
             : Field(frozen::string(data + offset, N - offset - 1), f)
         {}
 
@@ -133,7 +133,7 @@ struct MetaInfo {
         }
 
         frozen::string m_name;
-        FieldType Parent::*m_f;
+        FieldType Parent::* m_f;
     };
 
     /**
@@ -312,8 +312,7 @@ template<typename T>
 concept HasCustomTransformWrite = s_useCustomTransformWrite<T>;
 
 template<typename T>
-concept HasFields = !
-std::is_same_v<std::remove_cvref_t<decltype(MetaInfo::MetaFields<T>::s_fields)>, bool>;
+concept HasFields = !std::is_same_v<std::remove_cvref_t<decltype(MetaInfo::MetaFields<T>::s_fields)>, bool>;
 
 template<typename T>
 concept IsStringMap = IsMap<T> && s_isStringMap<T>;

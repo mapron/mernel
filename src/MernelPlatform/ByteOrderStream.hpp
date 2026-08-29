@@ -18,30 +18,30 @@ class ByteOrderDataStreamReader;
 class ByteOrderDataStreamWriter;
 template<class T>
 concept HasRead = requires(T t, ByteOrderDataStreamReader& reader) {
-                      t.readBinary(reader);
-                  };
+    t.readBinary(reader);
+};
 template<class T>
 concept HasWrite = requires(T t, ByteOrderDataStreamWriter& writer) {
-                       t.writeBinary(writer);
-                   };
+    t.writeBinary(writer);
+};
 
 template<class T>
 concept HasReadUserData = requires(T t, ByteOrderDataStreamReader& reader) {
-                              t.readBinary(reader, nullptr);
-                          };
+    t.readBinary(reader, nullptr);
+};
 template<class T>
 concept HasWriteUserData = requires(T t, ByteOrderDataStreamWriter& writer) {
-                               t.writeBinary(writer, nullptr);
-                           };
+    t.writeBinary(writer, nullptr);
+};
 
 template<class T>
 concept HasGlobalRead = requires(T t, ByteOrderDataStreamReader& reader) {
-                            readBinary(reader, t);
-                        };
+    readBinary(reader, t);
+};
 template<class T>
 concept HasGlobalWrite = requires(T t, ByteOrderDataStreamWriter& writer) {
-                             writeBinary(writer, t);
-                         };
+    writeBinary(writer, t);
+};
 
 inline constexpr uint_fast8_t createByteorderMask(uint_fast8_t endiannes8, uint_fast8_t endiannes16, uint_fast8_t endiannes32)
 {

@@ -59,8 +59,8 @@ std_path getExecutablePath()
         return std_path(abspath);
     return "./";
 #elif !defined(_WIN32)
-    int            len;
-    char           path[1024];
+    int  len;
+    char path[1024];
 
     // Read symbolic link /proc/self/exe
 

@@ -16,22 +16,20 @@ namespace Mernel::Reflection {
 
 template<class T>
 concept HasToJsonWrite = requires(T t, PropertyTree& data) {
-                             t.convertToJson(data);
-                         };
+    t.convertToJson(data);
+};
 
 template<class T>
-concept HasToJsonWriteGlobal = !
-PropertyTreeScalarHeld<T>&& requires(T t, PropertyTree& data) {
-                                convertToJson(t, data);
-                            };
+concept HasToJsonWriteGlobal = !PropertyTreeScalarHeld<T> && requires(T t, PropertyTree& data) {
+    convertToJson(t, data);
+};
 
 template<class T>
 concept HasToStringWrite = requires(T t, std::string& data) {
-                               data = t.toString();
-                           };
+    data = t.toString();
+};
 template<typename T>
-concept HasFieldsForWrite = HasFields<T> && !
-HasCustomTransformWrite<T> && !HasToStringWrite<T> && !HasToJsonWrite<T>;
+concept HasFieldsForWrite = HasFields<T> && !HasCustomTransformWrite<T> && !HasToStringWrite<T> && !HasToJsonWrite<T>;
 
 template<class CustomWriter>
 class PropertyTreeWriterBase {

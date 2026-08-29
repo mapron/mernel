@@ -8,11 +8,11 @@
 #include "MacroUtils.hpp"
 #include "MetaInfo.hpp"
 
-#define MAKE_FIELD_PAIR(typeBase, str, value) Field(str, &typeBase ::value),
-#define MAKE_FIELD_SINGLE(typeBase, value) Field(#value, &typeBase ::value),
+#define MAKE_FIELD_PAIR(typeBase, str, value) Field(str, &typeBase::value),
+#define MAKE_FIELD_SINGLE(typeBase, value) Field(#value, &typeBase::value),
 
-#define MAKE_FIELD_SINGLE_OFFSET_1(typeBase, value) Field(1, #value, &typeBase ::value),
-#define MAKE_FIELD_SINGLE_OFFSET_2(typeBase, value) Field(2, #value, &typeBase ::value),
+#define MAKE_FIELD_SINGLE_OFFSET_1(typeBase, value) Field(1, #value, &typeBase::value),
+#define MAKE_FIELD_SINGLE_OFFSET_2(typeBase, value) Field(2, #value, &typeBase::value),
 
 #define MAKE_FIELD_LIST_PAIRED(typeBase, ...) \
     INTERNAL_EXPAND(FOR_EACH_BY_PAIR(MAKE_FIELD_PAIR, typeBase, __VA_ARGS__))
