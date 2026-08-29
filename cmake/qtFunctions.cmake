@@ -1,5 +1,6 @@
 include_guard(GLOBAL)
 
+get_target_property(QT_MOC_EXECUTABLE ${QT_CMAKE_EXPORT_NAMESPACE}::moc IMPORTED_LOCATION_RELWITHDEBINFO)
 configure_file(${MERNEL_ROOT}/cmake/mocWrapper.cmake.in ${CMAKE_BINARY_DIR}/mocWrapper.cmake @ONLY)
 
 # qt5_make_output_file saved from deprecated
