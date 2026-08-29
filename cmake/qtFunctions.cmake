@@ -1,7 +1,8 @@
 include_guard(GLOBAL)
-
+if (Qt6_FOUND)
 get_target_property(QT_MOC_EXECUTABLE ${QT_CMAKE_EXPORT_NAMESPACE}::moc IMPORTED_LOCATION_RELWITHDEBINFO)
 configure_file(${MERNEL_ROOT}/cmake/mocWrapper.cmake.in ${CMAKE_BINARY_DIR}/mocWrapper.cmake @ONLY)
+endif()
 
 # qt5_make_output_file saved from deprecated
 # macro used to create the names of output files preserving relative dirs
