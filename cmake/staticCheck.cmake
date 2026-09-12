@@ -25,7 +25,7 @@ function(AddStaticCheckTarget)
     set(globHeaders ${allFiles})
     list(FILTER globHeaders INCLUDE REGEX "\\.(h|hpp)$")
     set(globSources ${allFiles})
-    list(FILTER globSources INCLUDE REGEX "\\.(cc|cpp|cxx)$")
+    list(FILTER globSources INCLUDE REGEX "\\.(c|cc|cpp|cxx)$")
 
     set(sources ${globSources} ${globHeaders})
     if (NOT sources)
