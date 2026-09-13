@@ -41,4 +41,16 @@ inline std::string pathToLower(const std_path& path)
     return str;
 }
 
+inline bool isExistingDirectory(const std_path& path)
+{
+    std::error_code ec;
+    return std::filesystem::exists(path, ec) && std::filesystem::is_directory(path, ec);
+}
+
+inline bool isExistingFile(const std_path& path)
+{
+    std::error_code ec;
+    return std::filesystem::exists(path, ec) && std::filesystem::is_regular_file(path, ec);
+}
+
 }
