@@ -17,6 +17,7 @@
 #include <deque>
 #include <array>
 #include <string>
+#include <cstdint>
 
 #include <frozen/string.h>
 

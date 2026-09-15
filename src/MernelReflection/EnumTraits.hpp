@@ -6,6 +6,7 @@
 #pragma once
 
 #include <tuple>
+#include <cstdint>
 
 #include <frozen/unordered_map.h>
 #include <frozen/string.h>
