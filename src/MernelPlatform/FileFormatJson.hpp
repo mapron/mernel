@@ -19,4 +19,6 @@ MERNELPLATFORM_EXPORT bool writeJsonToBufferNoexcept(std::string& buffer, const 
 MERNELPLATFORM_EXPORT PropertyTree readJsonFromBuffer(const std::string& buffer) noexcept(false);
 MERNELPLATFORM_EXPORT std::string writeJsonToBuffer(const PropertyTree& data, bool pretty = false) noexcept(false);
 
+MERNELPLATFORM_EXPORT bool readDirtyJsonFromBufferNoexcept(const std::string& buffer, PropertyTree& data) noexcept(true);
+
 }

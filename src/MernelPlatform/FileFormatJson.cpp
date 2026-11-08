@@ -15,6 +15,8 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/filestream.h>
 
+#include <jsoncons/json.hpp>
+
 namespace Mernel {
 
 namespace {
@@ -55,6 +57,7 @@ void jsonToPropery(PropertyTree& data, rapidjson::Value& input)
         } break;
         case rapidjson::kObjectType:
         {
+            data = {};
             data.convertToMap();
             auto& m = data.getMap();
             for (auto keyIt = input.MemberBegin(); keyIt != input.MemberEnd(); ++keyIt) {
@@ -126,6 +129,58 @@ void propertyToJson(const PropertyTree& data, rapidjson::Value& json, rapidjson:
     }
 }
 
+void jsonconsToProperty(PropertyTree& data, const jsoncons::json& input)
+{
+    switch (input.type()) {
+        case jsoncons::json_type::null:
+        {
+            data = {};
+        } break;
+        case jsoncons::json_type::boolean:
+        {
+            data = PropertyTreeScalar(input.as<bool>());
+        } break;
+        case jsoncons::json_type::object:
+        {
+            data.convertToMap();
+            auto& m = data.getMap();
+            for (const auto& member : input.object_range()) {
+                std::string key(member.key().data(), member.key().size());
+                jsonconsToProperty(m[key], member.value());
+            }
+        } break;
+        case jsoncons::json_type::array:
+        {
+            data.convertToList();
+            auto& l = data.getList();
+            l.resize(input.size());
+            size_t index = 0;
+            for (const auto& element : input.array_range()) {
+                jsonconsToProperty(l[index++], element);
+            }
+        } break;
+        case jsoncons::json_type::string:
+        case jsoncons::json_type::byte_string:
+        {
+            std::string inputString(input.as_string_view().data(), input.as_string_view().size());
+            data = PropertyTreeScalar(std::move(inputString));
+        } break;
+        case jsoncons::json_type::uint64:
+        {
+            data = PropertyTreeScalar(static_cast<std::int64_t>(input.as<std::uint64_t>()));
+        } break;
+        case jsoncons::json_type::int64:
+        {
+            data = PropertyTreeScalar(input.as<std::int64_t>());
+        } break;
+        case jsoncons::json_type::float16:
+        case jsoncons::json_type::float64:
+        {
+            data = PropertyTreeScalar(input.as<double>());
+        } break;
+    }
+}
+
 }
 
 bool readJsonFromBufferNoexcept(const std::string& buffer, PropertyTree& data) noexcept(true)
@@ -185,6 +240,25 @@ std::string writeJsonToBuffer(const PropertyTree& data, bool pretty) noexcept(fa
     if (!writeJsonToBufferNoexcept(buffer, data, pretty))
         throw std::runtime_error("Failed to write JSON");
     return buffer;
+}
+
+bool readDirtyJsonFromBufferNoexcept(const std::string& buffer, PropertyTree& data) noexcept(true)
+{
+    using namespace jsoncons;
+    try {
+        auto options = json_options{}
+                           .allow_comments(true)
+                           .allow_trailing_comma(true);
+
+        json val = jsoncons::json::parse(buffer, options);
+        jsonconsToProperty(data, val);
+
+        return true;
+    }
+    catch (const ser_error& e) {
+        Logger(Logger::Err) << "Failed to parse input: " << e.what() << '\n';
+    }
+    return false;
 }
 
 }

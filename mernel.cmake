@@ -7,7 +7,7 @@ mark_as_advanced(MERNEL_PLATFORM_ONLY)
 AddTarget(TYPE [ MERNEL_BUILD_SHARED ? shared : static ] NAME MernelPlatform
     SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src/MernelPlatform
     EXPORT_PARENT_INCLUDES
-    LINK_LIBRARIES rapidjson zlib zstd_static)
+    LINK_LIBRARIES rapidjson jsoncons zlib zstd_static)
 
 if (MERNEL_PLATFORM_ONLY)
     return()

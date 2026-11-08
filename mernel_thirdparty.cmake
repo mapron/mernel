@@ -20,8 +20,11 @@ else()
 endif()
 
 # Json
-AddTarget(TYPE interface NAME rapidjson 
+AddTarget(TYPE interface NAME rapidjson
     SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/3rdparty)
+
+AddTarget(TYPE interface NAME jsoncons
+    SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/3rdparty/jsoncons/include)
 
 # frozen 
 AddTarget(TYPE interface NAME frozen 
