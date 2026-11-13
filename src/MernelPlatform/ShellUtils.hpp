@@ -13,10 +13,13 @@ namespace Mernel {
 
 MERNELPLATFORM_EXPORT bool showFolderInFileManager(const std_path& path);
 
+// Windows: fromDir/fromName.lnk. Linux: fromDir/fromName.desktop, where extraArgs must already be quoted for Exec.
+// toDir is the working dir; iconPath is not used on Windows yet.
 MERNELPLATFORM_EXPORT bool createShortCut(const std_path&    fromDir,
                                           const std::string& fromName,
                                           const std_path&    toDir,
                                           const std::string& toFilename,
-                                          const std::string& extraArgs);
+                                          const std::string& extraArgs,
+                                          const std_path&    iconPath = {});
 
 }
