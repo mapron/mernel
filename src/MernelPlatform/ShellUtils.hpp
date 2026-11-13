@@ -19,4 +19,13 @@ MERNELPLATFORM_EXPORT bool createShortCut(const std_path&    fromDir,
                                           const std::string& toFilename,
                                           const std::string& extraArgs);
 
+// Writes a freedesktop.org launcher (Linux only). execLine is written as is; the caller quotes it.
+// workingDir and iconPath are skipped when empty.
+MERNELPLATFORM_EXPORT bool createDesktopEntry(const std_path&    toDir,
+                                              const std::string& toFilename,
+                                              const std::string& name,
+                                              const std::string& execLine,
+                                              const std_path&    workingDir,
+                                              const std_path&    iconPath);
+
 }
