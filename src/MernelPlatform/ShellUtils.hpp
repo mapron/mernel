@@ -13,19 +13,13 @@ namespace Mernel {
 
 MERNELPLATFORM_EXPORT bool showFolderInFileManager(const std_path& path);
 
+// Windows: fromDir/fromName.lnk. Linux: fromDir/fromName.desktop, where extraArgs must already be quoted for Exec.
+// toDir is the working dir; iconPath is not used on Windows yet.
 MERNELPLATFORM_EXPORT bool createShortCut(const std_path&    fromDir,
                                           const std::string& fromName,
                                           const std_path&    toDir,
                                           const std::string& toFilename,
-                                          const std::string& extraArgs);
-
-// Writes a freedesktop.org launcher (Linux only). execLine is written as is; the caller quotes it.
-// workingDir and iconPath are skipped when empty.
-MERNELPLATFORM_EXPORT bool createDesktopEntry(const std_path&    toDir,
-                                              const std::string& toFilename,
-                                              const std::string& name,
-                                              const std::string& execLine,
-                                              const std_path&    workingDir,
-                                              const std_path&    iconPath);
+                                          const std::string& extraArgs,
+                                          const std_path&    iconPath = {});
 
 }

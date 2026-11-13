@@ -35,7 +35,8 @@ bool createShortCut(const std_path&    fromDir,
                     const std::string& fromName,
                     const std_path&    toDir,
                     const std::string& toFilename,
-                    const std::string& extraArgs)
+                    const std::string& extraArgs,
+                    const std_path&    iconPath)
 {
     CoInitializer coInit;
     auto          linkPath = fromDir / (fromName + g_linkExtension);
@@ -87,16 +88,6 @@ bool createShortCut(const std_path&    fromDir,
     return true;
 }
 
-bool createDesktopEntry(const std_path&,
-                        const std::string&,
-                        const std::string&,
-                        const std::string&,
-                        const std_path&,
-                        const std_path&)
-{
-    return false;
-}
-
 }
 #elif defined(__linux__)
 #include "FileIOUtils.hpp"
@@ -133,6 +124,22 @@ std::string escapeDesktopValue(const std::string& value)
     return result;
 }
 
+// Exec program: quoted per the Desktop Entry spec, then escaped as a string value.
+std::string quoteExecProgram(const std::string& program)
+{
+    std::string result = "\"";
+    for (char c : program) {
+        if (c == '"' || c == '`' || c == '$')
+            result += "\\\\";
+        if (c == '\\')
+            result += "\\\\\\";
+        if (c == '%')
+            result += "%";
+        result += c;
+    }
+    return result + "\"";
+}
+
 }
 
 bool showFolderInFileManager(const std_path& path)
@@ -165,32 +172,22 @@ bool createShortCut(const std_path&    fromDir,
                     const std::string& fromName,
                     const std_path&    toDir,
                     const std::string& toFilename,
-                    const std::string& extraArgs)
-{
-    return false;
-}
-
-bool createDesktopEntry(const std_path&    toDir,
-                        const std::string& toFilename,
-                        const std::string& name,
-                        const std::string& execLine,
-                        const std_path&    workingDir,
-                        const std_path&    iconPath)
+                    const std::string& extraArgs,
+                    const std_path&    iconPath)
 {
     std::error_code ec;
-    std_fs::create_directories(toDir, ec);
+    std_fs::create_directories(fromDir, ec);
     if (ec)
         return false;
 
     std::string content = "[Desktop Entry]\nType=Application\n";
-    content += "Name=" + escapeDesktopValue(name) + "\n";
-    content += "Exec=" + execLine + "\n";
-    if (!workingDir.empty())
-        content += "Path=" + escapeDesktopValue(path2string(workingDir)) + "\n";
+    content += "Name=" + escapeDesktopValue(fromName) + "\n";
+    content += "Exec=" + quoteExecProgram(path2string(toDir / toFilename)) + (extraArgs.empty() ? "" : " " + extraArgs) + "\n";
+    content += "Path=" + escapeDesktopValue(path2string(toDir)) + "\n";
     if (!iconPath.empty())
         content += "Icon=" + escapeDesktopValue(path2string(iconPath)) + "\n";
 
-    const std_path file = toDir / toFilename;
+    const std_path file = fromDir / (fromName + ".desktop");
     if (!writeFileFromBufferNoexcept(file, content))
         return false;
 
@@ -212,17 +209,8 @@ bool createShortCut(const std_path&    fromDir,
                     const std::string& fromName,
                     const std_path&    toDir,
                     const std::string& toFilename,
-                    const std::string& extraArgs)
-{
-    return false;
-}
-
-bool createDesktopEntry(const std_path&,
-                        const std::string&,
-                        const std::string&,
-                        const std::string&,
-                        const std_path&,
-                        const std_path&)
+                    const std::string& extraArgs,
+                    const std_path&    iconPath)
 {
     return false;
 }
