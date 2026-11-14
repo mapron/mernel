@@ -39,7 +39,8 @@ public:
         Warning,
         Notice,
         Info,
-        Debug
+        Debug,
+        None,
     };
 
     /// Change default logging behaviour.
@@ -58,8 +59,11 @@ public:
         Binary(const char* data, size_t size, size_t outputMax = size_t(-1));
         Binary(const unsigned char* data, size_t size, size_t outputMax = size_t(-1));
     };
+    /// Creates logLevel if verbose is true, and Logger::None if false
+    explicit Logger(bool verbose, int logLevel = Logger::Debug);
+
     /// Creates logger. If loglevel is flushable by backend, stream will be created.
-    Logger(int logLevel = Logger::Debug);
+    explicit Logger(int logLevel = Logger::Debug);
 
     /// Convenience constructor for outputting context. Context string will be enclosed in braces, if not empty.
     Logger(const std::string& context, int logLevel = Logger::Debug);

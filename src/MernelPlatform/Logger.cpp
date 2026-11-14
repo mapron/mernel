@@ -36,6 +36,11 @@ bool Logger::IsLogLevelEnabled(int logLevel)
     return g_loggerBackend && g_loggerBackend->LogEnabled(logLevel);
 }
 
+Logger::Logger(bool verbose, int logLevel)
+    : Logger(verbose ? logLevel : Logger::None)
+{
+}
+
 Logger::Logger(int logLevel)
     : m_logLevel(logLevel)
 {
